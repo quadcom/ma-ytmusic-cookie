@@ -227,3 +227,6 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
 - Writers' choices kept: the popup's "Cookies found" row is gone (three rows per the spec);
   the not-signed-in row reads "Not signed in to YouTube Music in this window."; providers are
   refetched after Save and Forget.
+- Measured 2026-10-04 on Adrian's desktop, signed 1.2.0 (unlisted): **Find my server** filled
+  the LAN address and offered the HTTPS base URL as the away-from-home choice ("a great
+  unexpected benefit" - Adrian). Phone check of the new look still to do.

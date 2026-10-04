@@ -203,3 +203,8 @@ stays 1.2.0).
 - Known limit (reasoned): Firefox may suspend an idle event page after about 30 s; the
   fresh-login step's 60-second wait relies on the tab's cookie events keeping it awake or
   ending the wait early. Measured the first time the step runs for real.
+- Measured 2026-10-04 on Adrian's desktop, signed 1.2.0 (unlisted): automatic updates switched
+  on; the first push went out on its own ("Last sent: 4 Oct, 11:12"), from the normal store,
+  about a minute after switching on; MA's YouTube Music provider afterwards: enabled, no
+  `last_error` (read via the API). "YouTube cookie changes seen: 0" at that point - no rotation
+  yet, so the change-triggered path is still to be seen in normal use.
