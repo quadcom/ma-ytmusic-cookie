@@ -1,6 +1,6 @@
 # PLAN_YTC_05 - Keep Music Assistant up to date automatically
 
-**Status:** proposed (2026-10-04). Nothing built. To ship in the same **1.2.0** release as
+**Status:** proposed (2026-10-04); probes done, design updated. Nothing built. To ship in the same **1.2.0** release as
 PLAN_YTC_04 (Adrian, 2026-10-04: "include it in the 1.2.0 push"); 1.2.0 is held, unsigned, until
 both are built and tested.
 
@@ -57,12 +57,15 @@ Reasoned, to be measured:
 - **Debounce**: a change starts (or restarts) a 2-minute `browser.alarms` timer, so a burst of
   rotations becomes one push.
 - **Throttle**: when the timer fires, push only if the last push was at least `minHours` ago
-  (default 6, set from the probes) **and** the built cookie differs from the last one sent
+  (default 1, set from the playback probe; was 6 before it) **and** the built cookie differs from the last one sent
   (compared by SHA-256 of the header string via `crypto.subtle.digest`; the cookie itself is
   never stored, only its hash and the push time, in `storage.local`).
-- **Health check**: a `browser.alarms` alarm every 30 minutes calls `MA.providerError`; if MA
-  reports an error on the YouTube Music provider, push at once (no throttle), at most once per
-  30 minutes, so an expired cookie is replaced without waiting.
+- **Health check**: a `browser.alarms` alarm every 5 minutes calls `MA.providerError`; if MA
+  reports an error on the YouTube Music provider, push at once (no throttle, no idle wait), at
+  most once per 30 minutes, so an expired cookie is replaced without waiting (see "Fresh login"
+  below when the browser has nothing newer). Changed from 30 to 5 minutes for the phone fix.
+- **Idle wait** (from the playback probe): a due push waits while any MA player is playing
+  YouTube Music, re-checking on the next alarm.
 - The push itself reuses `MA.pushCookie` with the saved settings and the provider chosen in
   settings (or the only one). The cookie is built with the same code as the popup's (moved into
   a shared `cookie.js` used by both), from the watched store.
@@ -114,9 +117,36 @@ Answered by Adrian 2026-10-04:
    YouTube Music app, not the browser, so there are no browser cookie changes to follow. The
    phone keeps the manual Send, which Adrian uses when MA shows a cookie error while he is away
    from his desk.
-5. Open: an easier way to fix a dead cookie from the phone (see "Phone fix" below).
+5. Phone fix: self-healing from the desktop (below), accepted 2026-10-04; desktop Firefox stays
+   running (Adrian).
+6. Fresh-login background tab: accepted 2026-10-04 ("add that to plan 5").
 
-## Phone fix (proposed 2026-10-04, awaiting Adrian)
+## Probe results (2026-10-04)
+
+- **Playback probe (measured, Adrian listening; MA polled read-only once a second):** a YouTube
+  Music track ("Balthus Bemused By Color") playing on the Lower Greatroom player; Adrian pressed
+  Send (a provider reconfigure + reload). Playback **stopped and resumed by itself after about
+  4-5 seconds** (Adrian's ears). MA's `playback_state` did not change and the provider reported
+  no error during it (the poll saw nothing, so the gap is a stall inside "playing").
+- Consequence for the design: a push is audible, so automatic pushes **wait until no MA player
+  is playing YouTube Music** (`players/all`: any player `playing` whose `current_media.uri`
+  starts with the YouTube Music provider's instance id). Exception: if the provider is already
+  in error, playback from it is broken anyway, so the push goes at once.
+- With pushes deferred to idle moments, the minimum gap drops from 6 hours to **1 hour**
+  (Adrian, 2026-10-04: set it from the probe).
+
+## Fresh login when the browser's copy is old (added 2026-10-04, Adrian)
+
+Google only rotates the login while YouTube is being used in the browser; with no YouTube tab
+open, the browser's cookie stays the same as the one MA holds. If MA reports the provider in
+error and the built cookie's hash equals the last one sent (nothing newer to send), the add-on
+opens `https://music.youtube.com/` in a background tab (`tabs.create({active: false})`), waits
+for the cookie set to change (onChanged on the relevant names) or 60 seconds, closes the tab,
+then pushes. At most once per hour; reason recorded if no new cookie arrives ("YouTube did not
+give a fresh login; open music.youtube.com and sign in."). Reasoned, not tested: whether a page
+load alone makes Google rotate the session cookies - measured the first time it runs.
+
+## Phone fix (proposed 2026-10-04)
 
 With automatic updates on in the desktop Firefox, the health check already pushes a fresh cookie
 as soon as MA reports the YouTube Music provider in error. Shortening that check from 30 to
