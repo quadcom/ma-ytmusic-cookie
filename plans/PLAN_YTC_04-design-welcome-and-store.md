@@ -93,6 +93,10 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
 ## Open questions (waiting on Adrian)
 
 1. ~~Which direction?~~ A (Studio), 2026-10-04.
-2. ~~Which add-on logo?~~ 2G (2026-10-04). Uses MA's lines: OHF permission before the store,
-   or a store-safe fallback.
+2. ~~Which add-on logo?~~ 2G (2026-10-04). Adrian's position (2026-10-04): 2G is far enough
+   from both marks to ship - it is red, not MA's blue; MA's lines are broken up and covered by
+   the play symbol; and the play is not YouTube's shape, only reminiscent of it. Decision: ship
+   2G without asking OHF first. Remaining risk (reasoned): the bar-and-chevron lines are still
+   recognisable, so OHF or Mozilla could ask for a change; the fix would be a new icon in an
+   update. A courtesy note to partner@openhomefoundation.org stays optional.
 3. Install page on GitHub Pages as well (optional, from the earlier discussion)?
