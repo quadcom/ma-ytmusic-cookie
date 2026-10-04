@@ -55,9 +55,34 @@ from there. Decisions are logged below as they are made.
   plus a white rounded play triangle in the roof peak (`M104 50 L146 75 L104 100 Z`, stroke 10,
   round joins). Saved as mockup `logo-2d.svg`. It is a derivative of MA's logo: before the store
   release, ask the Music Assistant project (or fall back to 2A with a white play).
+- 2026-10-04: Adrian noted the add-on is for YouTube Music, whose mark is a ring with a play
+  triangle on a red disc, not YouTube's rounded rectangle. Drawn: **2E** (MA house, white ring +
+  play in the peak: `circle cx120 cy80 r27 stroke 7`, triangle `M111 67 L135 80 L111 93 Z`) and
+  **2F** (same on a red `#ff0033` disc r36, ring r24). Mockup files `logo-2e.svg`, `logo-2f.svg`.
+
+### Logo rights (researched 2026-10-04)
+
+Measured (fetched and read):
+- Home Assistant logo, https://github.com/home-assistant/assets/blob/master/logo/README.md:
+  trademark of the Open Home Foundation (OHF); "not available for commercial use without express
+  written permission"; commercial = "anything designed to market or promote a product, software
+  or service that is for sale". Says nothing on modification. Contact partner@openhomefoundation.org.
+- https://github.com/OpenHomeFoundation/brand-assets: same notice; covers Open Home Foundation,
+  Home Assistant, **Music Assistant** and ESPHome. Full rules at brands.openhomefoundation.io,
+  which did not resolve on 2026-10-04.
+From a research agent (sources named, not re-read here):
+- Google's YouTube branding guidelines (developers.google.com/youtube/terms/branding-guidelines):
+  no changing YouTube logos or their colours, no implying endorsement.
+- home-assistant/brands: custom integrations may not use HA's own imagery (implies official).
+- Mozilla's add-on policies: names and descriptions must not mislead; icons not addressed directly.
+Reading: this add-on is free (MIT), so it is not "commercial" by OHF's definition; the plain,
+unmodified HA and MA logos as labels next to what they name is the low-risk use. A modified MA
+logo as the add-on's own icon (2D/2E/2F) is not covered and reads as official - needs OHF's
+written yes. YouTube Music's ring inside our icon conflicts with Google's no-modification rule.
 
 ## Open questions (waiting on Adrian)
 
 1. ~~Which direction?~~ A (Studio), 2026-10-04.
-2. Which add-on logo (1-4)? 4 is personal-use only.
+2. Which add-on logo? Adrian leans to the MA house + play family (2D/2E/2F); needs OHF
+   permission for the store, or a store-safe original fallback.
 3. Install page on GitHub Pages as well (optional, from the earlier discussion)?
