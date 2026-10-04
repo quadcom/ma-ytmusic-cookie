@@ -208,3 +208,13 @@ stays 1.2.0).
   about a minute after switching on; MA's YouTube Music provider afterwards: enabled, no
   `last_error` (read via the API). "YouTube cookie changes seen: 0" at that point - no rotation
   yet, so the change-triggered path is still to be seen in normal use.
+- Patch 2026-10-04 (Adrian: "patch-it, both"), in 1.2.1, after Adrian pointed out that a normal
+  window is fine now: the popup's window row no longer tells everyone to use a private window.
+  Private -> tick "Private window"; normal on Android or with automatic updates on -> tick
+  ("Normal window" / "Normal window - automatic updates keep it fresh"); normal on desktop with
+  them off -> amber "turn on automatic updates in settings to keep it fresh". Adrian also asked
+  that it be clear automatic updates are desktop-only and run while Firefox with the add-on is
+  open: the card is titled "Automatic updates (desktop)" with a line saying so, and the README,
+  store description and welcome page say the same; the README/store/welcome sending steps now
+  say a normal window is fine and a private window is optional.
+

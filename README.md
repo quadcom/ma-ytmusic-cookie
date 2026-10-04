@@ -20,13 +20,13 @@ Then allow it in private windows: open the add-on's settings in Firefox and turn
 
 ## Use it in one minute
 
-1. Open a **private window** (or private tab).
-2. Go to music.youtube.com and sign in.
+1. Go to music.youtube.com and sign in. A normal window is fine: on a computer, turn on **Automatic updates** (below) to keep Music Assistant's copy fresh; on a phone, where you listen in the YouTube Music app, the browser's login rarely changes. If you prefer, use a private window, which freezes the copy you send.
+2. Stay signed in.
 3. Open any playlist in your library.
 4. Tap the add-on's button, then choose **Copy** or **Send**.
    - **Copy** puts the login on your clipboard. Paste it into Music Assistant > Settings > Providers > YouTube Music.
    - **Send** puts it straight into Music Assistant for you.
-5. Close the private window **without signing out**. Signing out, or browsing normally with the same account, can make Google replace the cookie and stop your copy working.
+5. If you used a private window, close it **without signing out**.
 
 ## Set up Send (once)
 
@@ -44,7 +44,7 @@ Press **Test connection** to check it. By default the address and sign-in sync, 
 
 ## Automatic updates (desktop)
 
-Off by default. Turn it on in the add-on's settings and it uses your everyday Firefox YouTube login, with no private window.
+For Firefox on a computer only. Off by default. Turn it on in the add-on's settings and it uses your everyday Firefox YouTube login, with no private window. It works for as long as Firefox is open on that computer with the add-on installed and the switch on.
 
 - It sends the new login to Music Assistant at most once an hour, and only when nothing is playing from YouTube Music.
 - If Music Assistant reports that the login has stopped working, it sends a fresh one within minutes.

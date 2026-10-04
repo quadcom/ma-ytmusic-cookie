@@ -59,16 +59,17 @@
       <p class="hint">Anyone using this Firefox profile can use the token.</p>
     </section>
 
-    <section class="card">
+    <section class="card" id="sync-card">
       <h2>Sync</h2>
       <label class="toggle"><input id="sync" type="checkbox" checked><span class="track" aria-hidden="true"></span><span>Sync these settings to my other Firefox computers</span></label>
       <p class="hint">Firefox encrypts them first. Firefox on phones does not sync add-on data, so sign in there once.</p>
     </section>
 
     <section class="card" id="auto-card" hidden>
-      <h2>Automatic updates</h2>
+      <h2>Automatic updates (desktop)</h2>
       <label class="toggle"><input id="auto" type="checkbox"><span class="track" aria-hidden="true"></span><span>Send new YouTube cookies to Music Assistant automatically</span></label>
       <p class="hint">Uses your normal Firefox YouTube login, not a private window. When YouTube refreshes your login, the add-on sends the new one to Music Assistant - at most once an hour, and only while nothing is playing from YouTube Music. If Music Assistant reports the login has stopped working, it sends a fresh one within minutes.</p>
+      <p class="hint">This runs in Firefox on your computer, for as long as Firefox is open with this add-on installed and this switch on. Firefox on phones cannot do it; on a phone, use Send.</p>
       <p id="auto-last" class="hint"></p>
       <p id="auto-problem" class="hint warn-text" hidden></p>
       <p id="auto-seen" class="hint"></p>

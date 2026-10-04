@@ -29,9 +29,19 @@
 
   try {
     const c = await build();
-    row("st-window", c.priv, c.priv
-      ? "Private window"
-      : "Normal window - cookie will expire sooner, so use a private window if you can.");
+    // A normal window is fine to send from. Only a desktop without automatic updates gets a
+    // nudge, because there a browser that keeps using YouTube makes the sent copy go stale.
+    let normalOk = true, normalText = "Normal window";
+    if (!c.priv) {
+      const android = (await browser.runtime.getPlatformInfo()).os === "android";
+      const auto = (await browser.storage.local.get("auto")).auto;
+      if (!android && auto && auto.enabled) normalText = "Normal window - automatic updates keep it fresh";
+      else if (!android) {
+        normalOk = false;
+        normalText = "Normal window - turn on automatic updates in settings to keep it fresh";
+      }
+    }
+    row("st-window", c.priv || normalOk, c.priv ? "Private window" : normalText);
     row("st-signed", c.signedIn, c.signedIn
       ? "Signed in to YouTube Music"
       : "Not signed in to YouTube Music in this window.");

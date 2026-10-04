@@ -144,6 +144,6 @@ Version **1.0.3**. Supersedes the Copy/Paste parts of section 1 and fills in sec
   automatic-updates card already is - Firefox for Android has no add-on sync, so the switch does
   nothing there and its own hint says so. Change: in `options.js`, when
   `runtime.getPlatformInfo().os === "android"`, hide the Sync card (sync stays on internally; on
-  Android `storage.sync` behaves as local storage, so nothing else changes). Waiting on
-  "patch-it"; would ship in 1.2.1.
+  Android `storage.sync` behaves as local storage, so nothing else changes). Built 2026-10-04
+  ("patch-it, both"), in 1.2.1: `#sync-card` hidden in `options.js` on Android.
 

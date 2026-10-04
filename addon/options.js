@@ -203,7 +203,8 @@ function autoSay(text, kind) {
 
 (async () => {
   try {
-    if ((await browser.runtime.getPlatformInfo()).os === "android") return;
+    // Phones get neither card: Firefox for Android has no add-on sync and cannot run the watcher.
+    if ((await browser.runtime.getPlatformInfo()).os === "android") { $("sync-card").hidden = true; return; }
   } catch (e) { /* assume desktop */ }
   $("auto-card").hidden = false;
   showAuto((await browser.storage.local.get("auto")).auto);
