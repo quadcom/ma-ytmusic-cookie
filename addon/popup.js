@@ -56,6 +56,21 @@
     busy(false);
   });
 
+  // Fourth row: only when automatic updates are on, and never on Android.
+  try {
+    const android = (await browser.runtime.getPlatformInfo()).os === "android";
+    const a = (await browser.storage.local.get("auto")).auto;
+    if (!android && a && a.enabled) {
+      const t = a.lastPushAt
+        ? new Date(a.lastPushAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+        : "";
+      $("st-auto").hidden = false;
+      row("st-auto", !a.lastProblem, a.lastProblem
+        ? "Automatic updates on - " + a.lastProblem
+        : "Automatic updates on - " + (t ? "last sent " + t : "not sent yet"));
+    }
+  } catch (e) { /* the row is optional */ }
+
   const settings = await MA.loadSettings();
   const detail = $("ma-detail");
   const pill = (cls, text, icon) => {

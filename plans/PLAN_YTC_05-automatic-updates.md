@@ -1,6 +1,8 @@
 # PLAN_YTC_05 - Keep Music Assistant up to date automatically
 
-**Status:** proposed (2026-10-04); probes done, design updated. Nothing built. To ship in the same **1.2.0** release as
+**Status:** part-built (2026-10-04). Built into 1.2.0 (held with PLAN_YTC_04), lint clean,
+smoke-tested in a headless Firefox (see build notes). Not yet run against Adrian's real
+YouTube login and MA. To ship in the same **1.2.0** release as
 PLAN_YTC_04 (Adrian, 2026-10-04: "include it in the 1.2.0 push"); 1.2.0 is held, unsigned, until
 both are built and tested.
 
@@ -183,3 +185,21 @@ stays 1.2.0).
 - Android: the settings card and the popup row are hidden when
   `(await browser.runtime.getPlatformInfo()).os === "android"`, and the background ignores
   `auto-set` there.
+
+## Build notes (2026-10-04)
+
+- Added at review: switching automatic updates on schedules `ytc-debounce` 1 minute later, so
+  the first send does not wait for YouTube's next rotation (which could be hours away).
+- Writers' choices kept: `auto-set` / `auto-push-now` answer through a shared `guarded()` that
+  also holds the overlap flag ("A push is already running."); the health check exits quietly
+  when MA, permission or the provider is missing; a failed `auto-set` reverts the toggle; the
+  "Last problem" line uses a `.warn-text` class.
+- Smoke test (measured, headless Firefox, add-on installed temporarily, no MA configured):
+  welcome tab opened on install; the settings card shows on desktop; `auto-set` on -> alarms
+  `ytc-health` (every 5 min) and `ytc-debounce` (once); setting `__Secure-3PSIDTS` counted one
+  change while a `SIDCC` change was ignored; `auto-push-now` refused with "Music Assistant is not
+  set up in this add-on yet." and the settings card showed it as the last problem; `auto-set`
+  off cleared both alarms.
+- Known limit (reasoned): Firefox may suspend an idle event page after about 30 s; the
+  fresh-login step's 60-second wait relies on the tab's cookie events keeping it awake or
+  ending the wait early. Measured the first time the step runs for real.

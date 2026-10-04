@@ -180,3 +180,54 @@ $("forget").addEventListener("click", async () => {
     ? "Forgotten. The address and token are removed from this Firefox and from your synced settings."
     : "Forgotten. The address and token are removed from this Firefox profile.", "ok");
 });
+
+// Automatic updates: the background owns the "auto" state; this page only reads it and sends two messages.
+const when = (ms) => new Date(ms).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+
+function showAuto(a) {
+  a = a || {};
+  $("auto").checked = !!a.enabled;
+  $("auto-last").textContent = a.lastPushAt ? "Last sent: " + when(a.lastPushAt) : "Not sent yet";
+  $("auto-problem").hidden = !a.lastProblem;
+  $("auto-problem").textContent = a.lastProblem ? "Last problem: " + a.lastProblem : "";
+  $("auto-seen").textContent = "YouTube cookie changes seen: " + (a.changesSeen || 0) +
+    (a.lastChangeAt ? " (last " + when(a.lastChangeAt) + ")" : "");
+}
+
+function autoSay(text, kind) {
+  $("auto-msg").textContent = text;
+  $("auto-msg").className = "status " + (kind || "");
+}
+
+(async () => {
+  try {
+    if ((await browser.runtime.getPlatformInfo()).os === "android") return;
+  } catch (e) { /* assume desktop */ }
+  $("auto-card").hidden = false;
+  showAuto((await browser.storage.local.get("auto")).auto);
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.auto) showAuto(changes.auto.newValue);
+  });
+  $("auto").addEventListener("change", async () => {
+    const enabled = $("auto").checked;
+    try {
+      const r = await browser.runtime.sendMessage({ type: "auto-set", enabled });
+      if (r && r.ok) autoSay(enabled ? "Automatic updates are on." : "Automatic updates are off.", "ok");
+      else throw new Error((r && r.message) || "Could not change the setting.");
+    } catch (err) {
+      $("auto").checked = !enabled;
+      autoSay(err.message, "bad");
+    }
+  });
+  $("auto-now").addEventListener("click", async () => {
+    $("auto-now").disabled = true;
+    autoSay("Sending...");
+    try {
+      const r = await browser.runtime.sendMessage({ type: "auto-push-now" });
+      autoSay((r && r.message) || (r && r.ok ? "Sent." : "Could not send."), r && r.ok ? "ok" : "bad");
+    } catch (err) {
+      autoSay(err.message, "bad");
+    }
+    $("auto-now").disabled = false;
+  });
+})();

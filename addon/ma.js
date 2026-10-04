@@ -243,5 +243,20 @@ const MA = {
       return null;
     }
   },
+
+  // True while any player is playing something from the given provider instance (its track uris
+  // start with the instance id). A failed lookup counts as "not playing".
+  async ytMusicPlaying(settings, instanceId) {
+    try {
+      const players = await MA.call(settings, "players/all");
+      return (players || []).some((p) => {
+        const state = p.playback_state || p.state;
+        const uri = p.current_media && p.current_media.uri;
+        return state === "playing" && typeof uri === "string" && uri.startsWith(instanceId);
+      });
+    } catch {
+      return false;
+    }
+  },
 };
 globalThis.MA = MA;

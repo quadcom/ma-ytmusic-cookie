@@ -42,6 +42,15 @@ If you would rather use a token you made yourself, choose "Paste a token instead
 
 Press **Test connection** to check it. By default the address and sign-in sync, encrypted by Firefox, between your desktop Firefox installs signed in to the same Firefox account with add-on data sync on; untick the box in the settings to keep them on this device only. Firefox for Android has no add-on sync, so sign in once on your phone too.
 
+## Automatic updates (desktop)
+
+Off by default. Turn it on in the add-on's settings and it uses your everyday Firefox YouTube login, with no private window.
+
+- It sends the new login to Music Assistant at most once an hour, and only when nothing is playing from YouTube Music.
+- If Music Assistant reports that the login has stopped working, it sends a fresh one within minutes.
+- Firefox must be left running on your computer.
+- It is not available on phones. Use **Send** there.
+
 ## Good to know
 
 - **Android:** if the mobile site misbehaves, use "Request desktop site" in Firefox's menu.

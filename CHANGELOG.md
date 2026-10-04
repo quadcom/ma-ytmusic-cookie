@@ -5,6 +5,7 @@
 - A new look, with its own logo.
 - Find my server looks for Music Assistant at the usual addresses.
 - A welcome page walks you through setup after install.
+- Optional automatic updates: keep Music Assistant's YouTube Music login fresh while you use YouTube.
 
 ## 1.1.0
 
