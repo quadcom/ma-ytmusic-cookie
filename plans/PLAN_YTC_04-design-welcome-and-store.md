@@ -1,7 +1,9 @@
 # PLAN_YTC_04 - One design for the popup, settings and welcome pages, plus the store page
 
-**Status:** proposed (2026-10-04). Design approved by Adrian; build spec below is final. Waiting on
-"let's build plan 04".
+**Status:** part-built (2026-10-04). 1.2.0 written to the build spec, reviewed, `web-ext lint`
+clean (0/0/0), loaded temporarily in the build box's Firefox (welcome page opened on install).
+Held, unsigned, at Adrian's request: it ships together with PLAN_YTC_05. Store screenshots and
+Adrian's desktop/phone test still to do.
 
 ## Goal
 
@@ -209,3 +211,19 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
    update. A courtesy note to partner@openhomefoundation.org stays optional.
 3. ~~Find my server?~~ Added 2026-10-04.
 4. Install page on GitHub Pages as well (optional, from the earlier discussion)?
+
+## Build notes (2026-10-04)
+
+- Icons rendered from `logo.svg` in the build box's Chrome over CDP with a transparent default
+  background (`Emulation.setDefaultBackgroundColorOverride` alpha 0), 16/32/48/96/128 px, RGBA.
+- Space Grotesk latin variable woff2 fetched from Google Fonts' CSS API (v22) plus the OFL text
+  from google/fonts.
+- Fixed at review: the settings status line lost its `status` class whenever a message coloured
+  it (`say()` replaced `className`); README steps still named the removed "Sign in to Music
+  Assistant" button.
+- Changed at review: tick/warning icons were assigned through `innerHTML` (three `web-ext lint`
+  `UNSAFE_VAR_ASSIGNMENT` warnings, which AMO review flags); now built as DOM nodes by a shared
+  `addon/icons.js` (`iconSvg("ok"|"warn")`) loaded by the popup and welcome page.
+- Writers' choices kept: the popup's "Cookies found" row is gone (three rows per the spec);
+  the not-signed-in row reads "Not signed in to YouTube Music in this window."; providers are
+  refetched after Save and Forget.

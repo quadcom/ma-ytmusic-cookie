@@ -4,41 +4,76 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YT Music Cookie settings</title>
+<link rel="stylesheet" href="theme.css">
 <link rel="stylesheet" href="options.css">
 </head>
 <body>
 <main>
-  <h1>Music Assistant settings</h1>
-  <label for="address">Music Assistant address</label>
-  <input id="address" type="url" placeholder="http://192.168.1.10:8095" autocomplete="off">
-  <div class="buttons"><button id="signin" type="button">Sign in to Music Assistant</button></div>
-  <div id="choice" class="buttons" hidden>
-    <button id="signin-ha" type="button">Sign in with Home Assistant</button>
-    <button id="signin-builtin" type="button">Sign in with a Music Assistant account</button>
+  <div class="settings">
+    <header class="brand big">
+      <img class="logo" src="icons/logo.svg" alt="">
+      <div>
+        <h1>Music Assistant settings</h1>
+        <p class="sub">Set this up once and the popup can send your YouTube Music login straight to Music Assistant.</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2><img class="mark" src="icons/partners/ma.svg" alt="">Music Assistant server</h2>
+      <label for="address">Music Assistant address</label>
+      <div class="row">
+        <input id="address" type="url" placeholder="http://192.168.1.10:8095" autocomplete="off">
+        <button id="save" type="button" class="btn secondary">Save</button>
+      </div>
+      <div class="row wrap">
+        <button id="find" type="button" class="btn secondary">Find my server</button>
+        <button id="use-base" type="button" class="btn secondary" hidden></button>
+      </div>
+      <p class="hint">Away from home, use an address your phone can reach from outside.</p>
+    </section>
+
+    <section class="card">
+      <h2>Sign in</h2>
+      <p id="badge" class="badge" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Signed in. This Firefox has its own Music Assistant token.</p>
+      <div class="row wrap">
+        <button id="signin-ha" type="button" class="btn primary" disabled><span class="mark-chip"><img class="mark" src="icons/partners/ha.svg" alt=""></span>Sign in with Home Assistant</button>
+        <button id="signin-builtin" type="button" class="btn secondary" disabled><img class="mark" src="icons/partners/ma.svg" alt="">Music Assistant account</button>
+      </div>
+      <p id="signin-hint" class="hint">Enter the address and press Save first, then sign in.</p>
+      <div id="account" class="account" hidden>
+        <label for="username">Username</label>
+        <input id="username" type="text" autocomplete="off">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="off">
+        <div class="row"><button id="signin-account" type="button" class="btn primary">Sign in</button></div>
+      </div>
+      <details>
+        <summary>Paste a token instead</summary>
+        <label for="token">Access token</label>
+        <div class="row">
+          <input id="token" type="password" autocomplete="off">
+          <button id="show" type="button" class="btn secondary">Show</button>
+        </div>
+        <p class="hint">Make the token in Music Assistant, not Home Assistant: Settings > Profile > Long-lived access tokens. Signing in to Music Assistant through Home Assistant is fine. The account must be an admin, because changing YouTube Music's sign-in needs admin. The token lasts one year.</p>
+      </details>
+      <p class="hint">Anyone using this Firefox profile can use the token.</p>
+    </section>
+
+    <section class="card">
+      <h2>Sync</h2>
+      <label class="toggle"><input id="sync" type="checkbox" checked><span class="track" aria-hidden="true"></span><span>Sync these settings to my other Firefox computers</span></label>
+      <p class="hint">Firefox encrypts them first. Firefox on phones does not sync add-on data, so sign in there once.</p>
+    </section>
+
+    <footer class="foot">
+      <div class="row wrap">
+        <button id="test" type="button" class="btn secondary">Test connection</button>
+        <button id="forget" type="button" class="btn ghost">Forget</button>
+      </div>
+      <p id="status" class="status" role="status"></p>
+    </footer>
+    <p class="small-print">Not affiliated with Google, YouTube, Home Assistant, Music Assistant or the Open Home Foundation.</p>
   </div>
-  <div id="account" hidden>
-    <label for="username">Username</label>
-    <input id="username" type="text" autocomplete="off">
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="off">
-    <div class="buttons"><button id="signin-account" type="button">Sign in</button></div>
-  </div>
-  <details>
-    <summary>Paste a token instead</summary>
-    <label for="token">Access token</label>
-    <span class="row"><input id="token" type="password" autocomplete="off"> <button id="show" type="button">Show</button></span>
-    <p class="help">Make the token in Music Assistant, not Home Assistant: Settings > Profile > Long-lived access tokens. Signing in to Music Assistant through Home Assistant is fine. The account must be an admin, because changing YouTube Music's sign-in needs admin. The token lasts one year.</p>
-  </details>
-  <label class="check"><input id="sync" type="checkbox" checked> Sync these settings to my other Firefox devices</label>
-  <p class="help">Firefox encrypts these before they leave this device. They reach only Firefox installs signed in to the same Firefox account with add-on data sync turned on.</p>
-  <div class="buttons">
-    <button id="save">Save</button>
-    <button id="test">Test connection</button>
-    <button id="forget">Forget</button>
-  </div>
-  <p id="status" role="status"></p>
-  <p class="help">Anyone using this Firefox profile can use the token.</p>
-  <p class="help">Away from home, use an address your phone can reach from outside.</p>
 </main>
 <script src="ma.js"></script>
 <script src="options.js"></script>

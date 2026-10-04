@@ -2,11 +2,47 @@ const $ = (id) => document.getElementById(id);
 
 function say(text, kind) {
   $("status").textContent = text;
-  $("status").className = kind || "";
+  $("status").className = "status " + (kind || "");
 }
 
 function form() {
   return { address: $("address").value.trim().replace(/\/+$/, ""), token: $("token").value.trim(), sync: $("sync").checked };
+}
+
+function showBadge() {
+  $("badge").hidden = !$("token").value.trim();
+}
+
+// Shows the sign-in buttons Music Assistant offers; both stay disabled until its answer is known.
+async function refreshProviders() {
+  const { address } = form();
+  $("signin-ha").hidden = false;
+  $("signin-builtin").hidden = false;
+  $("signin-ha").disabled = true;
+  $("signin-builtin").disabled = true;
+  $("account").hidden = true;
+  const hint = $("signin-hint");
+  hint.hidden = false;
+  hint.textContent = "Enter the address and press Save first, then sign in.";
+  if (!address || !(await MA.hasPermission(address).catch(() => false))) return;
+  let providers;
+  try {
+    providers = await MA.loginProviders(address);
+  } catch (err) {
+    hint.textContent = err.message;
+    return;
+  }
+  if (form().address !== address) return;
+  const ha = providers.includes("homeassistant"), builtin = providers.includes("builtin");
+  if (!ha && !builtin) {
+    hint.textContent = "This Music Assistant offers no sign-in this add-on knows. Paste a token instead.";
+    return;
+  }
+  $("signin-ha").hidden = !ha;
+  $("signin-builtin").hidden = !builtin;
+  $("signin-ha").disabled = false;
+  $("signin-builtin").disabled = false;
+  hint.hidden = true;
 }
 
 MA.loadSettings().then(async (s) => {
@@ -14,9 +50,38 @@ MA.loadSettings().then(async (s) => {
   $("address").value = s.address;
   $("token").value = s.token;
   $("sync").checked = s.sync;
+  showBadge();
   if (s.fromSync && !(await MA.hasPermission(s.address).catch(() => false))) {
     say("Settings arrived from your other Firefox. Press Save to let this Firefox reach the server.");
   }
+  refreshProviders();
+});
+
+$("find").addEventListener("click", async () => {
+  $("use-base").hidden = true;
+  $("find").disabled = true;
+  say("Looking for Music Assistant at the usual addresses.");
+  try {
+    const found = await MA.findServer();
+    if (!found) {
+      return say("No Music Assistant found at the usual addresses. Type its address instead, for example http://192.168.1.10:8095.", "bad");
+    }
+    $("address").value = found.address;
+    say(`Found Music Assistant ${found.version} at ${found.address}. Press Save.`, "ok");
+    if (/^https:\/\//i.test(found.baseUrl) && found.baseUrl !== found.address) {
+      $("use-base").textContent = `Use ${found.baseUrl} instead (works away from home)`;
+      $("use-base").dataset.address = found.baseUrl;
+      $("use-base").hidden = false;
+    }
+  } finally {
+    $("find").disabled = false;
+  }
+});
+
+$("use-base").addEventListener("click", () => {
+  $("address").value = $("use-base").dataset.address;
+  $("use-base").hidden = true;
+  say("Address filled in. Press Save.");
 });
 
 $("show").addEventListener("click", () => {
@@ -35,6 +100,8 @@ $("save").addEventListener("click", async () => {
     await MA.saveSettings({ address, token, sync });
     if (!granted) return say("Firefox needs permission to reach that address. Press Save again and allow it.", "bad");
     say("Saved. Press Test connection to check it works.", "ok");
+    showBadge();
+    refreshProviders();
   } catch (err) {
     say(err.message, "bad");
   }
@@ -63,6 +130,7 @@ async function completeSignIn(address, shortToken) {
   const { token, isAdmin } = await MA.finishSignIn(address, shortToken);
   $("token").value = token;
   await MA.saveSettings({ address, token, sync: $("sync").checked });
+  showBadge();
   if (!isAdmin) {
     return say("Signed in, but this account is not a Music Assistant admin, so it cannot change YouTube Music's sign-in. Sign in with an admin account.", "bad");
   }
@@ -81,27 +149,9 @@ async function attempt(fn) {
   }
 }
 
-$("signin").addEventListener("click", () => attempt(async () => {
-  const { address } = form();
-  $("choice").hidden = true;
-  $("account").hidden = true;
-  if (!address || !(await MA.hasPermission(address).catch(() => false))) {
-    return say("Enter the address and press Save first, then sign in.", "bad");
-  }
-  say("Asking Music Assistant how it signs people in.");
-  const providers = await MA.loginProviders(address);
-  const ha = providers.includes("homeassistant"), builtin = providers.includes("builtin");
-  if (ha && builtin) {
-    $("choice").hidden = false;
-    return say("Choose how to sign in.");
-  }
-  if (ha) return signInHa();
-  if (builtin) return showAccount();
-  say("This Music Assistant offers no sign-in this add-on knows. Paste a token instead.", "bad");
-}));
-
 function showAccount() {
   $("account").hidden = false;
+  $("username").focus();
   say("Enter your Music Assistant username and password, then press Sign in.");
 }
 
@@ -124,6 +174,8 @@ $("forget").addEventListener("click", async () => {
   const cleared = await MA.forget();
   $("address").value = "";
   $("token").value = "";
+  showBadge();
+  refreshProviders();
   say(cleared
     ? "Forgotten. The address and token are removed from this Firefox and from your synced settings."
     : "Forgotten. The address and token are removed from this Firefox profile.", "ok");

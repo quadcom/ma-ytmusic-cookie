@@ -4,22 +4,31 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>YT Music Cookie</title>
+  <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <main>
-    <ul class="status">
-      <li id="st-window">Window: checking...</li>
-      <li id="st-signed">Signed in: checking...</li>
-      <li id="st-count">Cookies found: checking...</li>
+    <header class="brand">
+      <img class="logo" src="icons/logo.svg" alt="">
+      <div>
+        <h1>YT Music Cookie</h1>
+        <p class="sub">for Music Assistant</p>
+      </div>
+    </header>
+    <ul class="checks">
+      <li id="st-window"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 20H3Z"/><path d="M12 10v4M12 17h.01"/></svg><span class="text">Private window: checking...</span></li>
+      <li id="st-signed"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 20H3Z"/><path d="M12 10v4M12 17h.01"/></svg><span class="text">Signed in to YouTube Music: checking...</span></li>
+      <li id="st-ma"><img class="mark" src="icons/partners/ma.svg" alt=""><span class="text">Music Assistant</span><span class="detail" id="ma-detail"></span></li>
     </ul>
-    <p id="hint-private" class="warn" hidden>Allow this add-on to run in private windows in its add-on settings.</p>
-    <button id="copy" type="button">Copy cookie for Music Assistant</button>
+    <p id="hint-private" class="small-print warn" hidden>Allow this add-on to run in private windows in its add-on settings.</p>
     <select id="provider" hidden aria-label="YouTube Music provider"></select>
-    <button id="send" type="button" hidden>Send to Music Assistant</button>
-    <p id="msg" role="status"></p>
+    <button id="send" class="btn primary" type="button" hidden><span class="mark-chip"><img class="mark" src="icons/partners/ma.svg" alt=""></span>Send to Music Assistant</button>
+    <button id="copy" class="btn secondary" type="button">Copy cookie</button>
+    <p id="msg" class="small-print" role="status"></p>
     <a id="settings" href="#">Music Assistant settings</a>
   </main>
+  <script src="icons.js"></script>
   <script src="ma.js"></script>
   <script src="popup.js"></script>
 </body>

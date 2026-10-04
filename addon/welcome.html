@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to YT Music Cookie</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body>
+  <main class="page">
+    <header class="brand big">
+      <img class="logo" src="icons/logo.svg" alt="">
+      <div>
+        <h1>Welcome to YT Music Cookie</h1>
+        <p class="sub">Three steps and your YouTube Music login goes to Music Assistant in one tap.</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>1 · Allow private windows</h2>
+      <p id="incognito-status" class="status-line">Checking…</p>
+      <p class="hint">On desktop: open the Add-ons page (Ctrl+Shift+A), choose YT Music Cookie, and set Run in Private Windows to Allow.</p>
+      <p class="hint">On Android: open Firefox's menu &gt; Add-ons, tap YT Music Cookie, and turn on Run in private browsing.</p>
+    </section>
+
+    <section class="card">
+      <h2>2 · Connect Music Assistant</h2>
+      <p>Find your server, then sign in through Home Assistant or a Music Assistant account.</p>
+      <button type="button" id="open-options" class="btn primary">Open Music Assistant settings</button>
+    </section>
+
+    <section class="card">
+      <h2>3 · Send your login</h2>
+      <ol class="steps">
+        <li>Open a private window.</li>
+        <li>Go to music.youtube.com and sign in.</li>
+        <li>Open any playlist in your library.</li>
+        <li>Press the add-on's button, then Send to Music Assistant.</li>
+        <li>Close the private window without signing out.</li>
+      </ol>
+    </section>
+
+    <footer>
+      <p><a href="https://github.com/quadcom/ma-ytmusic-cookie#readme" target="_blank" rel="noopener">How it works</a></p>
+      <p class="small-print">Not affiliated with Google, YouTube, Home Assistant, Music Assistant or the Open Home Foundation.</p>
+    </footer>
+  </main>
+  <script src="icons.js"></script>
+<script src="welcome.js"></script>
+</body>
+</html>

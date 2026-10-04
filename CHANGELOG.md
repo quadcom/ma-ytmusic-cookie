@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- A new look, with its own logo.
+- Find my server looks for Music Assistant at the usual addresses.
+- A welcome page walks you through setup after install.
+
 ## 1.1.0
 
 - Sign in to Music Assistant from the add-on - no token to make or paste.

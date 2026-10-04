@@ -30,12 +30,11 @@ Then allow it in private windows: open the add-on's settings in Firefox and turn
 
 ## Set up Send (once)
 
-Open the add-on's settings and do this:
+After you install, a welcome page opens and walks you through this. You can also open the add-on's settings and do it yourself:
 
-1. Type your **Music Assistant address**, for example `http://192.168.1.10:8095`.
-2. Press **Save and allow**, so Firefox lets the add-on reach your server.
-3. Press **Sign in to Music Assistant**.
-4. Choose how to sign in: with **Home Assistant** (a Home Assistant login page opens in a tab and closes by itself), or with your **Music Assistant username and password**.
+1. Press **Find my server**. The add-on tries homeassistant.local and a few other usual addresses. If it does not find yours, type your **Music Assistant address**, for example `http://192.168.1.10:8095`.
+2. Press **Save** and allow Firefox to reach your server when it asks.
+3. Press **Sign in with Home Assistant** (a Home Assistant login page opens in a tab and closes by itself), or **Music Assistant account** to use a Music Assistant username and password.
 
 The add-on then makes its own long-lived Music Assistant token for this device. There is nothing to copy or paste. The account must be a Music Assistant admin.
 
@@ -59,3 +58,5 @@ The cookie is a full login to your Google account. Treat it like a password.
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
+
+Not affiliated with Google, YouTube, Home Assistant, Music Assistant or the Open Home Foundation.

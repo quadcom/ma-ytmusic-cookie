@@ -31,13 +31,22 @@
     return c.value;
   }
 
+  // Sets a check row's tick or warning icon, its class and its text.
+  const row = (id, ok, text) => {
+    const li = $(id);
+    li.className = ok ? "ok" : "warn";
+    li.querySelector(".icon").replaceWith(iconSvg(ok ? "ok" : "warn"));
+    li.querySelector(".text").textContent = text;
+  };
+
   try {
     const c = await build();
-    $("st-window").textContent = c.priv
-      ? "Window: private"
-      : "Window: normal - cookie will expire sooner, so use a private window if you can.";
-    $("st-signed").textContent = "Signed in: " + (c.signedIn ? "yes" : "no");
-    $("st-count").textContent = "Cookies found: " + c.count;
+    row("st-window", c.priv, c.priv
+      ? "Private window"
+      : "Normal window - cookie will expire sooner, so use a private window if you can.");
+    row("st-signed", c.signedIn, c.signedIn
+      ? "Signed in to YouTube Music"
+      : "Not signed in to YouTube Music in this window.");
   } catch (err) {
     say("Could not read this window's cookies. Reload the add-on and try again.", "err");
   }
@@ -60,6 +69,32 @@
   });
 
   const settings = await MA.loadSettings();
+  const detail = $("ma-detail");
+  const pill = (cls, text, icon) => {
+    detail.replaceChildren();
+    const el = document.createElement(cls === "warn" && !settings ? "a" : "span");
+    el.className = "pill " + cls;
+    if (icon) el.append(iconSvg(icon));
+    el.append(text);
+    detail.append(el);
+    return el;
+  };
+  if (!settings) {
+    const el = pill("warn", "Not set up");
+    el.href = "#";
+    el.addEventListener("click", (e) => { e.preventDefault(); browser.runtime.openOptionsPage(); });
+  } else {
+    // Runs on its own so a slow or absent server never holds up the rest of the popup.
+    (async () => {
+      try {
+        if (!(await MA.hasPermission(settings.address))) throw new Error("no permission");
+        const info = await MA.serverInfo(settings.address);
+        pill("ok", String(info.server_version || "Connected"), "ok");
+      } catch (e) {
+        pill("warn", "Can't reach");
+      }
+    })();
+  }
   if (settings) {
     $("send").hidden = false;
     $("send").addEventListener("click", async () => {

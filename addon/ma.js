@@ -66,6 +66,30 @@ const MA = {
     return res.json();
   },
 
+  // Looks for Music Assistant at its usual default addresses. MA's /info allows any origin, so no
+  // site permission is needed. Returns the first answering candidate in list order, or null.
+  async findServer() {
+    const candidates = ["http://homeassistant.local:8095", "http://homeassistant:8095",
+      "http://music-assistant.local:8095", "http://localhost:8095"];
+    const probe = async (address) => {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 3000);
+      try {
+        const res = await fetch(address + "/info", { signal: ctl.signal });
+        if (!res.ok) return null;
+        const info = await res.json();
+        if (!info || !info.server_id || !info.server_version) return null;
+        const baseUrl = typeof info.base_url === "string" ? info.base_url.replace(/\/+$/, "") : "";
+        return { address, version: info.server_version, baseUrl };
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+    return (await Promise.all(candidates.map(probe))).find(Boolean) || null;
+  },
+
   _unreachable(address) {
     return `Can't reach Music Assistant at ${address}. Check the address and that you are on a network that can reach it.`;
   },
