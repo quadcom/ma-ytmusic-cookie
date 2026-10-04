@@ -178,7 +178,7 @@ switcher or its logo-options section.
 ### Not changed
 - Cookie building, Send, sync and sign-in logic: restyled only.
 
-### Logo rights (researched 2026-10-04)
+## Logo rights (researched 2026-10-04)
 
 Measured (fetched and read):
 - Home Assistant logo, https://github.com/home-assistant/assets/blob/master/logo/README.md:
