@@ -89,6 +89,23 @@ the cookie into the YouTube Music provider itself, so no paste is needed. Copy s
 - The provider itself refuses a cookie without `__Secure-3PAPISID` (upstream 2.10.5 provider
   code), which matches this plan's sign-in check.
 
+### MA login (added 2026-10-04)
+
+Adrian's MA runs as a Home Assistant add-on and he signs in to it through Home Assistant. That
+still makes him an MA user: MA keeps its own user list and links the HA login to it. Changing a
+provider's sign-in needs the **admin** role (`ROLE_SCOPES` in
+`music_assistant/controllers/webserver/helpers/auth_middleware.py:54`, fork; the user role only
+reads provider settings). So:
+
+- **Option A (recommended): a token from his existing admin user.** No new account. Made from his
+  MA profile (`auth/token/create`, one-year expiry, shown once). Exact menu location to be checked
+  in MA 2.10.5's UI at build time.
+- **Option B: a separate MA account just for the add-on.** It must also be admin to do the job,
+  so it is no safer; only benefit is a separate name in MA's user list to revoke.
+
+Port 8095 accepts a bearer token directly; Home Assistant's login is not involved in the API
+call.
+
 ### Settings page (`addon/options.html` + `addon/options.js`)
 
 - Two fields: **Music Assistant address** (e.g. `http://<ip>:8095`) and **access token**.
@@ -154,14 +171,40 @@ Shown only when settings are filled in. Same cookie-building and refusals as the
 
 ## Installing it
 
-Release Firefox only keeps add-ons that Mozilla has signed. Options:
+Correction 2026-10-04 (Adrian's answers): the main target is **Firefox for Android** (latest
+release, auto-updating, on a Pixel 11), with desktop Firefox as well. The repo may be **public**
+(Adrian, 2026-10-04). This replaces the earlier "unlisted" recommendation.
 
-1. **Mozilla-signed, unlisted** (recommended): `web-ext sign --channel unlisted` with a free AMO
-   API key. Mozilla signs it automatically within minutes; it is not published on the add-on
-   store. Result: an `.xpi` that installs permanently. Outward-facing (uploads the code to
-   Mozilla) - Adrian decides.
-2. **Temporary load** via `about:debugging` - no account, but removed at every Firefox restart.
-3. **Developer Edition / Nightly** with `xpinstall.signatures.required = false`.
+Facts (from Mozilla's Extension Workshop, fetched 2026-10-04 - reasoned, not yet tried here):
+- Release Firefox, desktop and Android, only installs add-ons signed by Mozilla. Signing is free.
+- Android release can install a signed `.xpi` from a file, through a hidden menu: Settings >
+  About Firefox > tap the logo 5 times > back to Settings > "Install extension from file".
+  Unsigned files are refused there too.
+- An add-on **listed** on addons.mozilla.org (AMO) and marked Android-compatible installs from the
+  store page on the phone in one tap, and gets updates automatically.
+
+Recommended: **listed on AMO** (public), since the repo is public anyway. Easiest on the phone,
+updates itself, and anyone else with the same Music Assistant problem can find it. Listed add-ons
+go through Mozilla review (automatic checks immediately; a human review may follow). Fallback while
+waiting for review: sign the same build **unlisted** (`web-ext sign --channel unlisted`) and
+install the `.xpi` from file on the phone. Both upload the code to Mozilla - outward-facing,
+Adrian confirms before the first upload.
+
+Manifest additions for this: `browser_specific_settings.gecko_android: {"strict_min_version":
+"128.0"}`; the AMO data-collection declaration
+(`browser_specific_settings.gecko.data_collection_permissions`) - check at build time which value
+fits an add-on that sends a login cookie only to a server the user names (likely
+`required: ["authenticationInfo"]`).
+
+### Android-specific behaviour to check in testing (reasoned)
+
+- The toolbar popup opens as a full page on Android; layout must fit a phone width.
+- `browser.cookies` and private tabs (`cookieStoreId == "firefox-private"`) are supported on
+  Android; the add-on must be allowed in private browsing there too (add-on settings > "Run in
+  private browsing").
+- music.youtube.com on a phone may push the app or a mobile layout. Whether that session's
+  cookie works in MA is untested; "Request desktop site" may be needed. First Android test answers
+  this.
 
 ## Project files on build
 
@@ -172,15 +215,17 @@ Release Firefox only keeps add-ons that Mozilla has signed. Options:
 
 ## Open questions (waiting on Adrian)
 
-1. Which Firefox does he use day to day - release, ESR, or Developer Edition? Decides install
-   route.
-2. OK to get a free Mozilla add-ons account and sign it unlisted (install option 1)?
-3. GitHub repo for it (private, under quadcom)? Not created yet.
-4. ~~Later idea: send the cookie straight into MA.~~ Adrian asked for it 2026-10-04; now in this
-   plan, see "Send straight to Music Assistant" below.
-6. MA address to use in settings: the LAN `http://<ip>:8095` form or the HTTPS proxy name - both
-   answer `/info` (measured 2026-10-04). Either works for the add-on; Adrian picks.
+1. ~~Which Firefox?~~ Answered 2026-10-04: Firefox for Android, latest, on a Pixel 11.
+2. OK to create a free Mozilla add-ons account and list it publicly on AMO? (Recommended above.)
+3. ~~GitHub repo?~~ Answered 2026-10-04: public is fine. Not created yet; creating it is
+   outward-facing, so it waits for "build".
+4. ~~Send the cookie straight into MA.~~ Adrian asked for it 2026-10-04; now in this plan, see
+   "Send straight to Music Assistant".
 5. Fallback method if the built value does not match: capture the real `Cookie` header from the
    next `music.youtube.com/youtubei/v1/browse` request via `webRequest.onBeforeSendHeaders`.
-   Needs the `webRequest` permission and a page reload. Only if step-by-step testing shows the
-   built value is wrong.
+   Needs the `webRequest` permission and a page reload. Only if testing shows the built value is
+   wrong.
+6. MA address to use in settings: the LAN `http://<ip>:8095` form or the HTTPS proxy name - both
+   answer `/info` (measured 2026-10-04). On a phone away from home, only an address reachable from
+   there works; at home either does.
+7. Which MA account owns the token (see "MA login" below).
