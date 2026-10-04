@@ -48,6 +48,13 @@ from there. Decisions are logged below as they are made.
   echoing MA's bars), 4 Exact mashup (YouTube-style play button with the MA logo on top) -
   flagged personal-use only: YouTube's logo rules forbid altering it and AMO policy rejects
   listings that borrow another brand's mark, so 4 is not for the store.
+- 2026-10-04: Adrian liked 2 (house). Variants 2A-2C drawn in HA/MA blue `#18bcf2` (both partner
+  logos use exactly that blue). Adrian: "more like 2A, but the play symbol should be white, and
+  the house is missing the Music Assistant inner white logo lines". Built **2D**: MA's own icon
+  (`icon.svg` house path with its bar and chevron cut-outs over the `#f2f4f9` base, 240x240)
+  plus a white rounded play triangle in the roof peak (`M104 50 L146 75 L104 100 Z`, stroke 10,
+  round joins). Saved as mockup `logo-2d.svg`. It is a derivative of MA's logo: before the store
+  release, ask the Music Assistant project (or fall back to 2A with a white play).
 
 ## Open questions (waiting on Adrian)
 
