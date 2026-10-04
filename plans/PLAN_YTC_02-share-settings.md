@@ -2,8 +2,8 @@
 
 **Status:** part-built (2026-10-04). 1.0.3 written to the build spec, lint clean, storage logic
 measured in a headless Firefox (seed from old local copy, sync wins, sync off removes the synced
-copy, Forget clears both). Not yet measured: real sync between two Firefox installs on one account,
-and Android.
+copy, Forget clears both). Android measured: no add-on sync there (see build notes). Not yet measured:
+real sync between two desktop Firefox installs.
 
 ## Goal
 
@@ -132,3 +132,11 @@ Version **1.0.3**. Supersedes the Copy/Paste parts of section 1 and fills in sec
   Firefox profile can use the token." (no longer only local once sync is on).
 - 1.0.3 is signed unlisted for testing, so the AMO listing ships as the next version up; the store
   still gets sync from its first version.
+- Measured 2026-10-04 (Adrian, Pixel 11, latest Firefox for Android): Firefox for Android's Sync
+  settings have **no Add-ons option**, so `storage.sync` does not leave the phone; the settings page
+  there came up empty. Sync works only between desktop Firefox installs. The phone falls back to
+  the Show button (copy the token on desktop, paste once on the phone). Desktop side: on 1.0.3 the
+  synced copy is only written when the popup or settings page first opens after the update
+  (desktop `storage-sync-v2.sqlite` held nothing for the add-on before that).
+- Idea raised for a later plan, not built: a "Sign in to Music Assistant" button on the settings
+  page that makes the token itself, so no device ever needs a token pasted in.
