@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "YT Music Cookie for Music Assistant",
+  "version": "1.0.0",
+  "description": "Copies or sends your YouTube Music login cookie to Music Assistant in one tap.",
+  "permissions": ["cookies", "clipboardWrite", "activeTab", "storage", "tabs"],
+  "host_permissions": ["https://music.youtube.com/*", "https://*.youtube.com/*"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "incognito": "spanning",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YT Music Cookie",
+    "default_icon": { "48": "icons/icon-48.png", "96": "icons/icon-96.png" }
+  },
+  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "icons": { "48": "icons/icon-48.png", "96": "icons/icon-96.png" },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ytc@quadcom.ca",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": { "required": ["authenticationInfo"] }
+    },
+    "gecko_android": { "strict_min_version": "142.0" }
+  }
+}

@@ -3,3 +3,6 @@ local/
 
 # Rendered output, never a source.
 .preview/
+web-ext-artifacts/
+.amo-credentials
+node_modules/

@@ -1,6 +1,8 @@
 # PLAN_YTC_01 - Firefox add-on that copies the YouTube Music cookie for Music Assistant
 
-**Status:** proposed (2026-10-04; send-to-MA added same day). Nothing built.
+**Status:** part-built (2026-10-04). Code written and passing `web-ext lint` (0 errors, 0 warnings);
+not yet run in a browser. Waiting on: Adrian's Mozilla add-ons account (signing + listing), and
+the first real test on his phone and against his MA.
 
 ## Goal
 
@@ -35,7 +37,7 @@ Firefox WebExtension, Manifest V3, no build step, no dependencies. Files at the 
   - `incognito: "spanning"` (Firefox default; one add-on instance sees both normal and private
     cookie stores).
   - `browser_specific_settings.gecko.id: "ytc@quadcom.ca"` (fixed id - needed for signing and so
-    updates replace rather than duplicate). `strict_min_version: "128.0"`.
+    updates replace rather than duplicate). `strict_min_version: "142.0"`.
   - `action.default_popup: "popup.html"`.
 - `addon/popup.html` + `addon/popup.js` + `addon/popup.css` - the only UI.
 
@@ -191,7 +193,7 @@ install the `.xpi` from file on the phone. Both upload the code to Mozilla - out
 Adrian confirms before the first upload.
 
 Manifest additions for this: `browser_specific_settings.gecko_android: {"strict_min_version":
-"128.0"}`; the AMO data-collection declaration
+"142.0"}`; the AMO data-collection declaration
 (`browser_specific_settings.gecko.data_collection_permissions`) - check at build time which value
 fits an add-on that sends a login cookie only to a server the user names (likely
 `required: ["authenticationInfo"]`).
@@ -229,3 +231,16 @@ fits an add-on that sends a login cookie only to a server the user names (likely
    answer `/info` (measured 2026-10-04). On a phone away from home, only an address reachable from
    there works; at home either does.
 7. Which MA account owns the token (see "MA login" below).
+
+## Build notes (2026-10-04)
+
+- Correction: minimum Firefox raised from 128 to **142** on desktop and Android. Found by
+  `web-ext lint`: `data_collection_permissions` (required for AMO) only exists from Firefox 140
+  desktop / 142 Android, so 128 would declare a key older versions ignore.
+- `data_collection_permissions.required` set to `["authenticationInfo"]`, as reasoned above.
+- Built as planned except: with more than one YouTube Music provider, the first Send shows a
+  picker and asks for Send again; the settings page's Test refuses until Save has granted the
+  site permission (otherwise Firefox's block looks like a dead server).
+- Untested risk: on Android the popup may open as its own tab, in which case "active tab" is the
+  popup, not YouTube Music, and the cookie store would be wrong. First phone test checks this.
+- Linting: `npx web-ext lint --source-dir addon` (web-ext 10.7.0, installed outside the repo).

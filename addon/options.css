@@ -1,0 +1,16 @@
+:root { color-scheme: light dark; --bg: #fff; --fg: #1b1b1f; --muted: #5c5c66; --line: #c8c8d0; --accent: #0060df; --bad: #b00020; --ok: #1a7f37; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1c1b22; --fg: #fbfbfe; --muted: #a8a8b3; --line: #52525e; --accent: #80b3ff; --bad: #ff8a9a; --ok: #6fd48a; }
+}
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+main { max-width: 36rem; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.3rem; }
+label { display: block; margin-top: 1rem; font-weight: 600; }
+input { box-sizing: border-box; width: 100%; margin-top: .25rem; padding: .6rem; font: inherit; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: 6px; }
+.buttons { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+button { padding: .6rem 1rem; font: inherit; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: 6px; }
+#save { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+#status { min-height: 1.5em; }
+#status.ok { color: var(--ok); }
+#status.bad { color: var(--bad); }
+.help { color: var(--muted); font-size: .9rem; }

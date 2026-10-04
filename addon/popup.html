@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YT Music Cookie</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <ul class="status">
+      <li id="st-window">Window: checking...</li>
+      <li id="st-signed">Signed in: checking...</li>
+      <li id="st-count">Cookies found: checking...</li>
+    </ul>
+    <p id="hint-private" class="warn" hidden>Allow this add-on to run in private windows in its add-on settings.</p>
+    <button id="copy" type="button">Copy cookie for Music Assistant</button>
+    <select id="provider" hidden aria-label="YouTube Music provider"></select>
+    <button id="send" type="button" hidden>Send to Music Assistant</button>
+    <p id="msg" role="status"></p>
+    <a id="settings" href="#">Music Assistant settings</a>
+  </main>
+  <script src="ma.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
