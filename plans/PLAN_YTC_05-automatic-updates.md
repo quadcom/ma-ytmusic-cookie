@@ -153,3 +153,33 @@ as soon as MA reports the YouTube Music provider in error. Shortening that check
 5 minutes (one small read-only API call) makes MA heal itself within minutes, from wherever
 Adrian is, as long as the desktop Firefox is running - so the phone usually needs to do nothing.
 The phone's manual Send stays as the fallback for when the desktop is off.
+
+## Build contract (2026-10-04, written at build start)
+
+Build authorised by Adrian 2026-10-04 ("let's build plan 05"). Ships in 1.2.0 (manifest version
+stays 1.2.0).
+
+- `addon/cookie.js` (written by the session model at build start): `YT_COOKIE.build(storeId)`
+  -> `{signedIn, count, value}` (moved out of `popup.js`, which now uses it) and
+  `YT_COOKIE.hash(value)` -> SHA-256 hex.
+- Manifest: `"permissions"` gains `"alarms"`; `"background": {"scripts": ["cookie.js", "ma.js",
+  "background.js"]}`.
+- State in `storage.local` key `"auto"`:
+  `{enabled: false, lastPushAt: 0, lastHash: "", lastProblem: "", lastProblemAt: 0,
+  changesSeen: 0, lastChangeAt: 0, lastHealthPushAt: 0, lastFreshTabAt: 0}` (times in ms).
+  Only the background writes it, except that nothing else may write it at all; pages read it and
+  follow `storage.onChanged`.
+- Messages to the background (`runtime.sendMessage`):
+  `{type: "auto-set", enabled: bool}` -> persists `enabled`, creates or clears the alarms,
+  answers `{ok: true}`;
+  `{type: "auto-push-now"}` -> one push from the normal store now, skipping throttle and idle
+  wait (the user asked), answers `{ok, message}` with a user-facing sentence.
+- Alarms: `"ytc-debounce"` (2 minutes after the last relevant cookie change), `"ytc-health"`
+  (every 5 minutes while enabled).
+- The YouTube Music provider pushed to: the first from `MA.findYtProviders(settings)`.
+- `MA.ytMusicPlaying(settings, instanceId)` (new, `ma.js`): true when any player from
+  `players/all` has `playback_state` (or `state`) `"playing"` and a `current_media.uri` starting
+  with `instanceId` (measured format on Adrian's MA: `ytmusic--YMu8ov9w://...`).
+- Android: the settings card and the popup row are hidden when
+  `(await browser.runtime.getPlatformInfo()).os === "android"`, and the background ignores
+  `auto-set` there.

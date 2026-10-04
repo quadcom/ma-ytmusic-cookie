@@ -1,6 +1,5 @@
 (async () => {
   const $ = (id) => document.getElementById(id);
-  const URL_YT = "https://music.youtube.com/";
   const busy = (on) => { $("copy").disabled = on; $("send").disabled = on; $("provider").disabled = on; };
   const say = (text, cls) => { $("msg").textContent = text; $("msg").className = cls || ""; };
 
@@ -9,18 +8,7 @@
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     const storeId = (tab && tab.cookieStoreId) || "firefox-default";
     const priv = storeId === "firefox-private" || !!(tab && tab.incognito);
-    let list;
-    try {
-      list = await browser.cookies.getAll({ url: URL_YT, storeId, firstPartyDomain: null });
-    } catch (e) {
-      // Firefox builds without first-party isolation reject the key.
-      list = await browser.cookies.getAll({ url: URL_YT, storeId });
-    }
-    // Longer paths first, as the browser orders the Cookie header; the sort is stable.
-    list.sort((a, b) => b.path.length - a.path.length);
-    const signedIn = list.some((c) => c.name === "SAPISID" || c.name === "__Secure-3PAPISID");
-    const value = list.map((c) => c.name + "=" + c.value).join("; ").trim();
-    return { priv, signedIn, count: list.length, value };
+    return { priv, ...(await YT_COOKIE.build(storeId)) };
   }
 
   // Returns the cookie value, or null after saying why it cannot be used.
