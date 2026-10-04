@@ -1,0 +1,15 @@
+/* C - Vinyl: deep navy, warm amber, big rounded shapes and a serif display face. */
+:root {
+  --page: #0f1a30; --surface: #17264a; --surface2: #1f3160; --border: #2d4278; --input: #12203f;
+  --text: #f7f2e8; --muted: #b8c2d8; --label: #8e9bbb; --link: #f5b54a;
+  --accent: #f2a93b; --accent-text: #1d1300; --ok: #7ee0a8; --ok-bg: rgba(126, 224, 168, .12);
+  --num-bg: #2d4278; --num-text: #b8c2d8;
+  --font: "DM Sans", system-ui, sans-serif; --font-display: "Fraunces", Georgia, serif;
+  --radius: 24px; --radius-sm: 18px; --radius-btn: 999px; --logo-radius: 50%;
+  --shadow: 0 24px 60px rgba(3, 8, 20, .55);
+}
+.brand h1 { font-weight: 800; }
+.brand.big h1 { font-size: 30px; }
+.step h2 { font-weight: 600; font-size: 20px; }
+.btn { font-weight: 700; }
+.logo { box-shadow: 0 0 0 4px rgba(242, 169, 59, .25); }

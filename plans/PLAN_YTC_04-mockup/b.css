@@ -1,0 +1,14 @@
+/* B - Clear: light, calm, numbered setup steps, blue accent close to Home Assistant's. */
+:root {
+  --page: #eef1f5; --surface: #ffffff; --surface2: #f6f8fa; --border: #d8dee6; --input: #ffffff;
+  --text: #15191f; --muted: #556170; --label: #6b7684; --link: #0b5cad;
+  --accent: #0b6bcb; --accent-text: #ffffff; --ok: #1a7f3c; --ok-bg: #e7f5ec;
+  --num-bg: #dfe5ec; --num-text: #3d4855;
+  --font: "IBM Plex Sans", system-ui, sans-serif; --font-display: "IBM Plex Sans", system-ui, sans-serif;
+  --radius: 12px; --radius-sm: 10px; --radius-btn: 8px; --logo-radius: 50%;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 8px 24px rgba(16, 24, 40, .06);
+}
+.step { background: transparent; padding: 0 0 4px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+.step:last-child { border-bottom: 0; padding-bottom: 0; }
+.brand h1 { font-weight: 600; }
+.step h2 { font-weight: 600; }

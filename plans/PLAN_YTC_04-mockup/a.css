@@ -1,0 +1,18 @@
+/* A - Studio: dark, bold, red accent like a music app; flat cards, no step numbers. */
+:root {
+  --page: #0c0c0e; --surface: #16161a; --surface2: #1f1f24; --border: #2e2e35; --input: #101013;
+  --text: #f4f4f5; --muted: #a8a8b3; --label: #7d7d88; --link: #ff8a80;
+  --accent: #e0312b; --accent-text: #ffffff; --ok: #5fd38d; --ok-bg: rgba(95, 211, 141, .1);
+  --num-bg: #2e2e35; --num-text: #a8a8b3;
+  --font: "Space Grotesk", system-ui, sans-serif; --font-display: "Space Grotesk", system-ui, sans-serif;
+  --radius: 14px; --radius-sm: 10px; --radius-btn: 10px; --logo-radius: 10px;
+  --shadow: 0 20px 50px rgba(0, 0, 0, .5);
+}
+.num { display: none; }
+.step { flex-direction: column; }
+.step h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.brand h1 { letter-spacing: -.01em; }
+.btn.primary:hover { background: #f03c35; }
+/* Logo 2G is a house shape of its own, so it sits bare rather than on a coloured tile. */
+.logo { background: none; border-radius: 0; }
+.logo img { width: 100%; height: 100%; display: block; }

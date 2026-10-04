@@ -1,6 +1,7 @@
 # PLAN_YTC_04 - One design for the popup, settings and welcome pages, plus the store page
 
-**Status:** proposed (2026-10-04). Design session in progress with Adrian; nothing built.
+**Status:** proposed (2026-10-04). Design approved by Adrian; build spec below is final. Waiting on
+"let's build plan 04".
 
 ## Goal
 
@@ -70,6 +71,113 @@ from there. Decisions are logged below as they are made.
   38-unit round-joined stroke (the outline), then white with a 24-unit round-joined stroke (the
   rounded body, corner radius 12) - over MA's house lines recoloured red on a white base.
 
+- 2026-10-04: 2G placed in the mockup's popup and settings headers, bare (no tile); Adrian
+  approved the layout. Mockup saved with this plan: `plans/PLAN_YTC_04-mockup/` (`index.html`,
+  `base.css`, `a.css` = the approved look; `b.css`/`c.css` kept as the rejected directions;
+  `logo-2g.svg`, unmodified partner marks `ma.svg`, `ha.svg`).
+- 2026-10-04: Adrian added **Find my server** (see build spec).
+
+## Find my server (added 2026-10-04)
+
+Measured 2026-10-04 from Adrian's PC: `GET /info` on MA answers with
+`Access-Control-Allow-Origin: *`, so an extension page can read it with no site permission;
+`http://homeassistant.local:8095/info` and `http://homeassistant:8095/info` both answer 200
+(HAOS's default host name; the MA add-on's default port). Reasoned, not tested: whether Firefox
+for Android resolves `.local` names.
+
+Why not more: Firefox add-ons have no mDNS/zeroconf API, so MA's own network announcement cannot
+be heard; scanning address ranges is slow, needs the device's own subnet (not available to an
+add-on), and risks AMO rejection as port scanning. A short list of default names is the honest
+version.
+
+## Build spec (final, 2026-10-04)
+
+Version **1.2.0**. Source of truth for every visual detail: `plans/PLAN_YTC_04-mockup/`
+(`index.html` + `base.css` + `a.css`). Copy the CSS rules needed, not the mockup's direction
+switcher or its logo-options section.
+
+### Assets
+- `addon/icons/logo.svg` = `logo-2g.svg`. Manifest `icons` and `action.default_icon` use it plus
+  PNG renders at 16, 32, 48, 96 and 128 px (`addon/icons/icon-<n>.png`; the old icon PNGs are
+  deleted). Render the PNGs from the SVG in the build box's Chrome (`bb-shot.mjs` on a page
+  showing the SVG at each size, transparent background); no new tools on Windows.
+- `addon/icons/partners/ha.svg`, `addon/icons/partners/ma.svg`: the unmodified marks from the MA
+  frontend (`src/assets/home-assistant-logo.svg`, `src/assets/icon.svg`).
+- Font: Space Grotesk (SIL OFL 1.1), bundled as `addon/fonts/SpaceGrotesk.woff2` (variable,
+  Latin subset) with `addon/fonts/OFL.txt`; `@font-face` in a shared `addon/theme.css`. No
+  remote font loads (the extension page policy blocks them).
+- `addon/theme.css`: the design-A variables and shared rules from `base.css` + `a.css`, loaded by
+  the popup, settings and welcome pages. `popup.css` / `options.css` keep only page-specific bits.
+
+### Popup (`popup.html`, `popup.css`, `popup.js`)
+- Header: 2G logo, "YT Music Cookie", "for Music Assistant".
+- Three status rows (`.checks`): Private window; Signed in to YouTube Music; Music Assistant
+  (MA mark, and a version pill from `MA.serverInfo` when settings exist and the site permission
+  is granted; a "Not set up" pill linking to settings otherwise). Each row shows a green tick, or
+  an amber warning icon with the existing warning text when it fails.
+- Primary button "Send to Music Assistant" with the MA mark in a white chip (hidden when not set
+  up, as now); secondary "Copy cookie"; message line; "Music Assistant settings" link. Provider
+  picker styled as an input. All existing logic unchanged.
+
+### Settings (`options.html`, `options.css`, `options.js`)
+- Header: 2G logo, "Music Assistant settings", one-line sub.
+- Card "Music Assistant server" (MA mark in the heading): address field + Save, and a
+  **Find my server** button. Hint line as in the mockup.
+- Card "Sign in": green badge "Signed in. This Firefox has its own Music Assistant token." when a
+  token is saved; buttons "Sign in with Home Assistant" (HA mark in a white chip, primary) and
+  "Music Assistant account" (MA mark, secondary), replacing the separate `#signin` -> choice
+  step: both show when `auth/providers` lists both, one when only one is offered; providers are
+  fetched when the page opens with a saved, permitted address, and again after Save.
+  Account form and "Paste a token instead" as now.
+- Card "Sync": the toggle styled as in the mockup; text "Sync these settings to my other Firefox
+  computers" and "Firefox encrypts them first. Firefox on phones does not sync add-on data, so
+  sign in there once."
+- Footer: Test connection, Forget, status line.
+- Small line at the bottom: "Not affiliated with Google, YouTube, Home Assistant, Music
+  Assistant or the Open Home Foundation."
+
+### Find my server (`ma.js` + settings)
+- `MA.findServer()`: in parallel, `GET <c>/info` for each `c` in
+  `["http://homeassistant.local:8095", "http://homeassistant:8095",
+  "http://music-assistant.local:8095", "http://localhost:8095"]`, each with a 3-second
+  `AbortController` timeout; a candidate counts when its JSON has `server_id` and
+  `server_version`. Returns the first in list order that answered, with its `base_url`, or null.
+- Settings: on success, fill the address field and say "Found Music Assistant <version> at
+  <address>. Press Save." If `base_url` is https and differs, also show a button "Use <base_url>
+  instead (works away from home)". On failure: "No Music Assistant found at the usual
+  addresses. Type its address instead, for example http://192.168.1.10:8095."
+- Runs only on the button press, never automatically, so the add-on makes no network calls the
+  user did not ask for.
+
+### Welcome page (`welcome.html`, `welcome.css`, `welcome.js`, `background.js`)
+- `manifest.json` gains `"background": {"scripts": ["background.js"]}`; `background.js` opens
+  `welcome.html` in a tab on `runtime.onInstalled` with `reason === "install"` only.
+- Content, design A: 2G logo and "Welcome to YT Music Cookie"; three cards:
+  1. "Allow private windows": a live tick from `browser.extension.isAllowedIncognitoAccess()`,
+     else the how-to for desktop and Android; re-checks when the tab regains focus.
+  2. "Connect Music Assistant": a button opening the settings page.
+  3. "Send your login": private window, music.youtube.com, sign in, open a playlist, press the
+     add-on, Send; then close the private window without signing out.
+  Footer: link to the GitHub README and the not-affiliated line.
+
+### Store listing
+- `amo-metadata.json` description refreshed to the 1.2.0 features (sign-in, Find my server,
+  phone support).
+- Screenshots: popup, settings and welcome page rendered at 1280x800 with `bb-shot.mjs` (example
+  address only, no private values) into `store/screenshots/` (tracked), uploaded to the AMO
+  listing (API v5 previews, or by Adrian in the Developer Hub) with the listed release.
+
+### Version, changelog, release
+- `manifest.json` 1.2.0. Changelog 1.2.0: "A new look, with its own logo." / "Find my server
+  looks for Music Assistant at the usual addresses." / "A welcome page walks you through setup
+  after install."
+- Release as PLAN_YTC_03 describes (listed on AMO, GitHub release), now as 1.2.0, after Adrian
+  tests it on desktop and phone. Plan 03's 1.1.0 sign-in test is still outstanding and is
+  covered by this test.
+
+### Not changed
+- Cookie building, Send, sync and sign-in logic: restyled only.
+
 ### Logo rights (researched 2026-10-04)
 
 Measured (fetched and read):
@@ -99,4 +207,5 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
    2G without asking OHF first. Remaining risk (reasoned): the bar-and-chevron lines are still
    recognisable, so OHF or Mozilla could ask for a change; the fix would be a new icon in an
    update. A courtesy note to partner@openhomefoundation.org stays optional.
-3. Install page on GitHub Pages as well (optional, from the earlier discussion)?
+3. ~~Find my server?~~ Added 2026-10-04.
+4. Install page on GitHub Pages as well (optional, from the earlier discussion)?
