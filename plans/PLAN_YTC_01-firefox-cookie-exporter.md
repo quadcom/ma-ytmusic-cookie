@@ -1,6 +1,6 @@
 # PLAN_YTC_01 - Firefox add-on that copies the YouTube Music cookie for Music Assistant
 
-**Status:** proposed (2026-10-04). Nothing built.
+**Status:** proposed (2026-10-04; send-to-MA added same day). Nothing built.
 
 ## Goal
 
@@ -63,6 +63,74 @@ Firefox WebExtension, Manifest V3, no build step, no dependencies. Files at the 
   signing out."
 - No display of the value itself (it is a full login to the Google account).
 
+## Send straight to Music Assistant (added 2026-10-04, Adrian's request)
+
+Adrian's rule (2026-10-04): he gives the add-on his MA server's address once, and the add-on pushes
+the cookie into the YouTube Music provider itself, so no paste is needed. Copy stays as a fallback.
+
+### What the server offers (measured 2026-10-04)
+
+- Adrian's MA: version **2.10.5**, HA add-on, port 8095 open on the LAN; `GET /info` answers
+  without login. `GET /api-docs/commands.json` on the live server lists `config/providers`,
+  `config/providers/reconfigure`, `config/flows/submit`, `config/flows/get`,
+  `config/flows/abort`, `auth/token/create` (345 commands in all).
+- `POST /api` takes one JSON command `{"message_id": "...", "command": "...", "args": {...}}`
+  with `Authorization: Bearer <token>`
+  (`music_assistant/controllers/webserver/controller.py:634`, Adrian's `ma-server` fork; upstream
+  2.10.5 has the same route).
+- The YouTube Music cookie is a **setup value**, not an ordinary setting: provider domain
+  `ytmusic`, key `cookie`, type secure string; the same form also holds `username` (required)
+  and `po_token_server_url` (`music_assistant/providers/ytmusic/setup_flow.py:22-35`). Upstream
+  2.10.5 reads it with `get_setup_value("cookie")` (fetched from GitHub 2026-10-04). So it is
+  changed through the **reconfigure flow**, the same form MA's own UI shows for "re-authenticate",
+  not through `config/providers/save`.
+- Secure values are never sent back by the server: a reconfigure form arrives with the cookie
+  field empty and the other fields prefilled (`music_assistant/models/setup_flow.py:561-564`).
+- The provider itself refuses a cookie without `__Secure-3PAPISID` (upstream 2.10.5 provider
+  code), which matches this plan's sign-in check.
+
+### Settings page (`addon/options.html` + `addon/options.js`)
+
+- Two fields: **Music Assistant address** (e.g. `http://<ip>:8095`) and **access token**.
+- Token: a long-lived token made in MA's own UI (user profile > tokens; MA calls it
+  `auth/token/create`, lasts one year). The page says where to make one. The add-on never asks
+  for the MA password.
+- "Test connection" button: `GET <address>/info` (no login) then `config/providers` with the
+  token. Reports "Connected to Music Assistant 2.10.5; YouTube Music found." or what failed.
+- Stored in `browser.storage.local` (stays in this Firefox profile, not synced). Stated on the
+  page: anyone with this Firefox profile can use the token.
+- Manifest gains `"options_ui": {"page": "options.html"}`, `"storage"` permission, and
+  `"optional_host_permissions": ["http://*/*", "https://*/*"]`. On save, the page calls
+  `browser.permissions.request({origins: ["<address>/*"]})` for that one server only, so the
+  add-on can reach it (Firefox lets an add-on with host permission skip the cross-site block).
+
+### Push steps (popup button "Send to Music Assistant")
+
+Shown only when settings are filled in. Same cookie-building and refusals as the copy button.
+
+1. `config/providers` -> keep entries with `domain == "ytmusic"`.
+   None -> refuse: "YouTube Music is not set up in Music Assistant yet. Add it there once, then
+   use this button." More than one -> a picker by name.
+2. `config/providers/reconfigure {instance_id}` -> a step of type form with a `flow_id` and the
+   entries `username`, `cookie`, `po_token_server_url`.
+3. `config/flows/submit {flow_id, values}` where `values` = every entry's current value from the
+   step, with `cookie` set to the new value. Nothing else is changed.
+4. Result: finish -> "Sent. Music Assistant is reloading YouTube Music." Same form back with
+   errors -> show MA's error text and stop. Abort -> show its reason and stop. Anything else
+   (network, 401, unknown step) -> `config/flows/abort {flow_id}` if a flow was opened, then show
+   the error.
+5. Then `config/providers/get {instance_id}` a few seconds later; if `last_error` is set, show it
+   ("Music Assistant says: ...").
+
+### Refusals added
+
+- No address or token saved -> the send button is hidden; the copy button still works.
+- `/info` does not answer -> "Can't reach Music Assistant at <address>." No retry loop.
+- 401 / 403 -> "Music Assistant refused the token. Make a new one in your MA profile."
+- The flow's form does not contain a `cookie` field -> refuse and abort the flow: "This Music
+  Assistant version changed how YouTube Music signs in; use Copy instead." (Guards against a
+  future MA renaming the field.)
+
 ## Refusals
 
 - **No cookies for music.youtube.com** -> no copy; says "Open music.youtube.com in this window and
@@ -81,6 +149,7 @@ Firefox WebExtension, Manifest V3, no build step, no dependencies. Files at the 
 - Compare the copied value against the real header from dev tools (the manual MA steps) in the
   same private window: same set of `name=value` pairs. Order difference is acceptable if MA
   accepts it - the final check is pasting into MA and playing a track.
+- Send to MA on Adrian's server, then play a YouTube Music track in MA.
 - `web-ext lint` on `addon/` (Mozilla's checker).
 
 ## Installing it
@@ -107,8 +176,10 @@ Release Firefox only keeps add-ons that Mozilla has signed. Options:
    route.
 2. OK to get a free Mozilla add-ons account and sign it unlisted (install option 1)?
 3. GitHub repo for it (private, under quadcom)? Not created yet.
-4. Later idea, not in this plan: send the cookie straight into Music Assistant's provider
-   settings through the MA server's API, so no paste is needed. Worth a plan of its own?
+4. ~~Later idea: send the cookie straight into MA.~~ Adrian asked for it 2026-10-04; now in this
+   plan, see "Send straight to Music Assistant" below.
+6. MA address to use in settings: the LAN `http://<ip>:8095` form or the HTTPS proxy name - both
+   answer `/info` (measured 2026-10-04). Either works for the add-on; Adrian picks.
 5. Fallback method if the built value does not match: capture the real `Cookie` header from the
    next `music.youtube.com/youtubei/v1/browse` request via `webRequest.onBeforeSendHeaders`.
    Needs the `webRequest` permission and a page reload. Only if step-by-step testing shows the
