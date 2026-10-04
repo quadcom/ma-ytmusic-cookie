@@ -64,6 +64,11 @@ from there. Decisions are logged below as they are made.
   thin red stroke round the play. Drawn **2G** (red `#e0312b` house, MA's white lines, white play
   `M96 108 L166 152 L96 196 Z` with a 7-unit red stroke in front) and **2H** (same, blue house).
   Files `logo-2g.svg`, `logo-2h.svg`. Still uses MA's lines, so the OHF question stands.
+- 2026-10-04: **Adrian chose 2G** and tuned it: play bigger, higher, rounder corners, then a
+  little higher again and nudged right to sit centred under the roof peak. Current 2G play
+  (240x240 box): triangle `M105 68 L169 116 L105 164 Z`, drawn twice - red `#e0312b` with a
+  38-unit round-joined stroke (the outline), then white with a 24-unit round-joined stroke (the
+  rounded body, corner radius 12) - over MA's house lines recoloured red on a white base.
 
 ### Logo rights (researched 2026-10-04)
 
@@ -88,6 +93,6 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
 ## Open questions (waiting on Adrian)
 
 1. ~~Which direction?~~ A (Studio), 2026-10-04.
-2. Which add-on logo? Adrian leans to the MA house + play family (2D/2E/2F); needs OHF
-   permission for the store, or a store-safe original fallback.
+2. ~~Which add-on logo?~~ 2G (2026-10-04). Uses MA's lines: OHF permission before the store,
+   or a store-safe fallback.
 3. Install page on GitHub Pages as well (optional, from the earlier discussion)?
