@@ -1,6 +1,6 @@
 # PLAN_YTC_03 - "Sign in to Music Assistant" makes the token itself, then release to the store
 
-**Status:** proposed (2026-10-04). Nothing built.
+**Status:** proposed, build authorised 2026-10-04 ("yes to all three, build it out").
 
 ## Goal
 
@@ -105,8 +105,7 @@ PLAN_YTC_01) and a full GitHub release.
 
 ## Open questions (waiting on Adrian)
 
-1. Offer the Music Assistant username/password sign-in too (for people without Home Assistant),
-   or Home Assistant only? Recommendation: both - the second is small, and the store listing
-   serves people without HA.
-2. Keep "Paste a token instead" as a hidden fallback? Recommendation: yes.
-3. Store listing name: keep "YT Music Cookie for Music Assistant"?
+All answered by Adrian 2026-10-04 ("yes to all three"):
+1. Both sign-ins: Home Assistant and Music Assistant username/password.
+2. "Paste a token instead" stays as a hidden fallback.
+3. Store name stays "YT Music Cookie for Music Assistant".
