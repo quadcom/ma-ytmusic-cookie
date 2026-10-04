@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Send now reaches a Music Assistant server on a plain http:// address, such as one on your home network.
+
 ## 1.0.0
 
 - Copy your YouTube Music login in the exact format Music Assistant asks for.

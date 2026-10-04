@@ -244,3 +244,11 @@ fits an add-on that sends a login cookie only to a server the user names (likely
 - Untested risk: on Android the popup may open as its own tab, in which case "active tab" is the
   popup, not YouTube Music, and the cookie store would be wrong. First phone test checks this.
 - Linting: `npx web-ext lint --source-dir addon` (web-ext 10.7.0, installed outside the repo).
+- 2026-10-04, measured on Adrian's desktop Firefox: 1.0.0 signed unlisted (web-ext sign, minutes).
+  "Test connection" to `http://<ip>:8095` failed as unreachable although the site permission was
+  granted and the server answered `/info` from curl. Cause: Firefox's default MV3 policy for
+  extension pages includes `upgrade-insecure-requests`, so the fetch went to `https://<ip>:8095`,
+  where MA has no TLS (curl exit 35). Fix in 1.0.1: `content_security_policy.extension_pages` set
+  to `script-src 'self'; object-src 'self';` (the default minus the upgrade).
+- MA's `/api` needs an **MA** token; a Home Assistant token is a different thing. (Reasoned; not
+  probed - Adrian first tried the token he uses for VS Code.)
