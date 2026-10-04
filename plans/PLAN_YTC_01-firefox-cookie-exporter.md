@@ -1,8 +1,9 @@
 # PLAN_YTC_01 - Firefox add-on that copies the YouTube Music cookie for Music Assistant
 
-**Status:** part-built (2026-10-04). Code written and passing `web-ext lint` (0 errors, 0 warnings);
-not yet run in a browser. Waiting on: Adrian's Mozilla add-ons account (signing + listing), and
-the first real test on his phone and against his MA.
+**Status:** part-built (2026-10-04). 1.0.2 signed (unlisted) and working on Adrian's desktop
+Firefox: Send pushed a cookie into his MA and MA accepted it (measured 2026-10-04, by Adrian),
+over both `http://<ip>:8095` and the HTTPS proxy name. Still to do: Android test, public AMO
+listing, a GitHub release carrying the signed `.xpi`.
 
 ## Goal
 
