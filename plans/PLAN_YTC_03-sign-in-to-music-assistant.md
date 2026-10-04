@@ -1,8 +1,9 @@
 # PLAN_YTC_03 - "Sign in to Music Assistant" makes the token itself, then release to the store
 
-**Status:** part-built (2026-10-04). 1.1.0 code written, lint clean, sign-in tab mechanism
-measured in a headless Firefox against Adrian's MA (see build notes). Waiting on: Adrian's real
-sign-in on desktop and phone, then the store release.
+**Status:** built (corrected 2026-10-04, end of session). Home Assistant sign-in measured end to
+end on desktop; 1.2.1 revokes the add-on's own previous token on re-sign-in. The release this plan
+described went out with PLAN_YTC_04 as listed 1.2.1 (awaiting review). Not measured: the Music
+Assistant username/password sign-in (Adrian has no such account), and sign-in on the phone.
 
 ## Goal
 

@@ -1,0 +1,36 @@
+const [,, addonPath] = process.argv;
+const ws = new WebSocket("ws://127.0.0.1:9333/session");
+let id = 0; const pending = new Map(); const logs = [];
+ws.onmessage = (e) => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); } else if (m.method === "log.entryAdded") logs.push(m.params.level + " " + m.params.text); };
+const send = (method, params) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+await new Promise((r) => (ws.onopen = r));
+await send("session.new", { capabilities: {} });
+await send("session.subscribe", { events: ["log.entryAdded"] });
+await send("webExtension.install", { extensionData: { type: "path", path: addonPath } });
+const ctx = (await send("browsingContext.getTree", {})).result.contexts[0].context;
+await send("browsingContext.navigate", { context: ctx, url: "moz-extension://0b5e0c1e-1111-4222-8333-444455556666/options.html", wait: "complete" });
+const ev = (expr) => send("script.evaluate", { expression: expr, target: { context: ctx }, awaitPromise: true }).then((r) => r.result?.result?.value ?? JSON.stringify(r));
+const A = process.env.MA_URL; // e.g. https://music-assistant.example; never committed
+console.log("providers:", await ev(`MA.loginProviders("${A}").then(JSON.stringify, e => "ERR " + e.message)`));
+await ev(`(() => { crypto.randomUUID = () => "testnonce"; window.R = "pending"; MA.signInWithHomeAssistant("${A}").then(c => window.R = "resolved code=" + c, e => window.R = "rejected: " + e.message); return "started"; })()`);
+await sleep(2500);
+let tree = (await send("browsingContext.getTree", {})).result.contexts;
+const other = tree.find((c) => c.context !== ctx);
+console.log("tab opened at:", other ? other.url.replace(/state=[^&]+/, "state=…") : "none");
+console.log("before redirect:", await ev("window.R"));
+await send("browsingContext.navigate", { context: other.context, url: A + "/?ytc_signin=testnonce&code=FAKE123", wait: "none" });
+await sleep(2500);
+console.log("after redirect:", await ev("window.R"));
+tree = (await send("browsingContext.getTree", {})).result.contexts;
+console.log("tabs left:", tree.length);
+// closing the tab early must reject
+await ev(`(() => { window.R = "pending"; MA.signInWithHomeAssistant("${A}").then(c => window.R = "resolved " + c, e => window.R = "rejected: " + e.message); return 1; })()`);
+await sleep(2500);
+tree = (await send("browsingContext.getTree", {})).result.contexts;
+const t2 = tree.find((c) => c.context !== ctx);
+if (t2) await send("browsingContext.close", { context: t2.context });
+await sleep(1000);
+console.log("after closing tab:", await ev("window.R"));
+console.log("console:", logs.filter((l) => !l.includes("SEARCH")).slice(0, 5).join(" | ") || "none");
+await send("session.end", {}); process.exit(0);

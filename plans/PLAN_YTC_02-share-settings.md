@@ -1,9 +1,8 @@
 # PLAN_YTC_02 - Reuse the Music Assistant settings on another Firefox
 
-**Status:** part-built (2026-10-04). 1.0.3 written to the build spec, lint clean, storage logic
-measured in a headless Firefox (seed from old local copy, sync wins, sync off removes the synced
-copy, Forget clears both). Android measured: no add-on sync there (see build notes). Not yet measured:
-real sync between two desktop Firefox installs.
+**Status:** part-built (2026-10-04, end of session). In 1.2.1. Measured: storage logic in a
+headless Firefox; Firefox for Android has no add-on sync (so the Sync card is hidden there). Not
+yet measured: real sync between two desktop Firefox installs.
 
 ## Goal
 

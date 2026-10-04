@@ -1,10 +1,8 @@
 # PLAN_YTC_05 - Keep Music Assistant up to date automatically
 
-**Status:** part-built (2026-10-04). Built into 1.2.0 (held with PLAN_YTC_04), lint clean,
-smoke-tested in a headless Firefox (see build notes). Not yet run against Adrian's real
-YouTube login and MA. To ship in the same **1.2.0** release as
-PLAN_YTC_04 (Adrian, 2026-10-04: "include it in the 1.2.0 push"); 1.2.0 is held, unsigned, until
-both are built and tested.
+**Status:** part-built (2026-10-04, end of session). In 1.2.1 (submitted). Measured: the first
+automatic push on Adrian's desktop, and the smoke test. Not yet seen in real use: a push triggered
+by YouTube rotating the login, the idle wait, and the fresh-login background tab.
 
 ## Goal
 

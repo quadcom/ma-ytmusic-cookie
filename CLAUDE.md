@@ -70,7 +70,31 @@ conservative with tokens.
 
 The trap, why, and how it presents — only failures that cost real time and are invisible from the code.
 
-*Nothing recorded yet.*
+- **A site permission with a port is ignored.** Requesting `http://<ip>:8095/*` grants nothing
+  usable: a cross-site POST to that origin fails with `NetworkError` while the response actually
+  arrived. Request `<scheme>://<host>/*` (`MA.sitePattern`). Looks exactly like "server down".
+  (Measured in clean profiles, PLAN_YTC_01 build notes.)
+- **Firefox MV3's default page policy upgrades http to https.** Without our own
+  `content_security_policy.extension_pages` (`script-src 'self'; object-src 'self';`), every
+  `fetch("http://...")` goes to https and a LAN server without TLS looks unreachable.
+- **Home Assistant tokens are not Music Assistant tokens.** Both are JWTs; an HA long-lived token
+  has only `iss/iat/exp` claims, an MA token has `sub/jti/username/role/token_name/is_long_lived`.
+  MA answers 401 to an HA token. Users confuse them; the UI says "made in Music Assistant".
+- **AMO's API write throttle is daily.** A burst of a few writes (preview uploads, PATCHes) then
+  429 "available in ~74000 seconds". Space writes minutes apart and expect to finish by hand in
+  the Developer Hub. Preview captions cannot go in the multipart upload; PATCH them as JSON.
+- **WebDriver BiDi cannot screenshot or resize extension pages** ("does not support browsing
+  contexts in privileged scope"), even with `-remote-allow-system-access`; navigating to and
+  evaluating in `moz-extension://` pages needs that flag. Screenshots go through
+  `dev/screenshots/` (shim) in the build box Chrome instead.
+- **Every signed version number is spent.** Unlisted test builds and listed store builds share
+  one version sequence on AMO; signing a test copy as X.Y.Z means the store release must be later.
+- **Git Bash quirks seen here:** `tar` reads `Z:/...` as a remote host (use `--force-local`);
+  native Python does not understand `/d/...` paths inside `-c` strings, while Node arguments are
+  converted - check where a file really landed before assuming it was not written.
+- **A cookie push to MA reloads the YouTube Music provider:** about 4-5 s of silence on whatever
+  is playing (measured, PLAN_YTC_05). Automatic pushes wait for idle for this reason. A failed
+  reload restores MA's previous cookie (MA's reconfigure flow), so a bad push cannot break it.
 
 ## Project specifics
 
@@ -82,3 +106,45 @@ Untouched by every refresh of the method. Lines other skills read, commented unt
 - per-branch: <file> <word>                cut-a-release
 - release-ignore-tags: <glob> <glob>       cut-a-release
 -->
+
+### What this is
+Firefox add-on (desktop and Android, MV3, plain JS, no build step) in `addon/`. Gets the YouTube
+Music login cookie in the exact form Music Assistant's YouTube Music provider wants (the raw
+`Cookie` header value, not a Netscape file) and copies it or sends it to MA (reconfigure flow over
+MA's `POST /api`). Add-on id `ytc@quadcom.ca`; public repo `quadcom/ma-ytmusic-cookie`; listed on
+addons.mozilla.org from 1.2.1. Private values (MA addresses, build box, AMO key file):
+`~/.claude/machine.md`, "YT Music Cookie" rows.
+
+### Status and next steps
+The plans carry the detail; read their status lines first. As of 2026-10-04:
+- 1.2.1 submitted as a **listed** AMO version, awaiting Mozilla's review (PLAN_YTC_04 build notes).
+- Still to do: two screenshots (`store/screenshots/3-settings.png`, `4-automatic.png`), the
+  `2-welcome` caption and the slug `yt-music-cookie-for-music-assistant` (blocked by the AMO
+  throttle, or done by Adrian in the Developer Hub - check `dev/amo/amo.mjs show` first); after
+  approval: GitHub release `v1.2.1` with the signed file and store link, README's "link coming"
+  replaced, the `v*-test` pre-releases deleted (ask first).
+- Open, measured later in normal use: automatic updates' change-triggered path and the
+  fresh-login background tab (PLAN_YTC_05); sync between two desktops (PLAN_YTC_02).
+- Ideas not planned yet: Chrome port (desktop only - Chrome on Android has no extensions);
+  GitHub Pages install page; a courtesy note to the Open Home Foundation about logo 2G.
+
+### Routines (developer material - not for the README)
+- Lint: `npx web-ext lint --source-dir addon` (web-ext installed outside the repo, e.g. in a
+  scratch folder with `npm install web-ext`). Must be 0/0/0 before signing.
+- Sign a private test build: `web-ext sign --channel unlisted --source-dir addon` with
+  `WEB_EXT_API_KEY`/`WEB_EXT_API_SECRET` read from the AMO key file (lines 1 and 2) in the same
+  command, never echoed. Store release: `--channel listed --amo-metadata amo-metadata.json`.
+- Phone install of a test build: GitHub pre-release with the `.xpi`, then Firefox for Android >
+  Settings > About > tap logo 5x > Install extension from file. Android may offer another app
+  for `.xpi`; cancel it, the file stays in Downloads.
+- Headless Firefox tests: `dev/firefox-test/` - start `firefox -no-remote -headless -profile
+  <fresh dir with user.js> --remote-debugging-port 9333 -remote-allow-system-access`; `user.js`
+  pins the add-on's internal UUID so `moz-extension://0b5e0c1e-.../options.html` is known.
+- Store screenshots: `dev/screenshots/` - shipping pages served from the build box with
+  `shim.js` injected as the first script, captured with the buildbox skill's `bb-shot.mjs`.
+- Icons: `addon/icons/logo.svg` (logo 2G) rendered to PNG by `dev/icons/render-icons.mjs` in the
+  build box Chrome with a transparent background.
+- AMO API: `dev/amo/amo.mjs` (JWT client; `node amo.mjs show` prints listing state) and
+  `amo-previews.mjs`; both read `KEYS` = path of the AMO key file.
+- Watching MA playback read-only during a test: `dev/watch-ma-playback.mjs` (`MA_URL`,
+  `MA_TOKEN` from the environment).

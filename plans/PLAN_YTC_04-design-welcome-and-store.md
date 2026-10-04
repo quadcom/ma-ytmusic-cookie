@@ -1,9 +1,8 @@
 # PLAN_YTC_04 - One design for the popup, settings and welcome pages, plus the store page
 
-**Status:** part-built (2026-10-04). 1.2.0 written to the build spec, reviewed, `web-ext lint`
-clean (0/0/0), loaded temporarily in the build box's Firefox (welcome page opened on install).
-Held, unsigned, at Adrian's request: it ships together with PLAN_YTC_05. Store screenshots and
-Adrian's desktop/phone test still to do.
+**Status:** part-built (2026-10-04, end of session). 1.2.1 built, tested on desktop and phone,
+and submitted as a listed AMO version (awaiting review). Left: two screenshots, one caption and
+the slug (AMO API throttle - see build notes), then the GitHub release after approval.
 
 ## Goal
 
