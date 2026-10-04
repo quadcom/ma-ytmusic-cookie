@@ -1,16 +1,58 @@
 // Music Assistant client. Plain script: the popup and options page load it with <script>.
 const MA = {
-  async loadSettings() {
-    const { ma } = await browser.storage.local.get("ma");
-    return ma && ma.address && ma.token ? { address: ma.address, token: ma.token } : null;
+  // Firefox does not honour a site permission that names a port (measured: the call is blocked),
+  // so the permission covers the whole host.
+  sitePattern(address) {
+    const u = new URL(address);
+    return u.protocol + "//" + u.hostname + "/*";
   },
 
-  async saveSettings({ address, token }) {
+  hasPermission(address) {
+    return browser.permissions.contains({ origins: [MA.sitePattern(address)] });
+  },
+
+  // storage.sync can be missing or throw (sync off, private profile); a failure means "no synced copy".
+  async _syncGet() {
+    try { return (await browser.storage.sync.get("ma")).ma || null; } catch { return null; }
+  },
+
+  async _syncSet(value) {
+    try {
+      if (value) await browser.storage.sync.set({ ma: value });
+      else await browser.storage.sync.remove("ma");
+    } catch { /* the local copy still holds the settings */ }
+  },
+
+  // The synced copy wins when complete, so a new token saved on one device reaches the others.
+  async loadSettings() {
+    const { ma } = await browser.storage.local.get("ma");
+    const local = ma && ma.address && ma.token ? { address: ma.address, token: ma.token } : null;
+    if (ma && ma.sync === false) return local && { ...local, sync: false, fromSync: false };
+    const s = await MA._syncGet();
+    if (s && s.address && s.token) return { address: s.address, token: s.token, sync: true, fromSync: true };
+    // Settings saved before sync existed (1.0.2 and older) seed the synced copy on first read.
+    if (local) await MA._syncSet(local);
+    return local && { ...local, sync: true, fromSync: false };
+  },
+
+  async saveSettings({ address, token, sync }) {
     address = String(address || "").trim().replace(/\/+$/, "");
     if (!/^https?:\/\/./i.test(address)) {
       throw new Error("Enter the address with http:// or https:// in front, for example http://192.168.1.10:8095.");
     }
-    await browser.storage.local.set({ ma: { address, token: String(token || "").trim() } });
+    token = String(token || "").trim();
+    sync = sync !== false;
+    await browser.storage.local.set({ ma: { address, token, sync } });
+    await MA._syncSet(sync ? { address, token } : null);
+  },
+
+  // Returns true when a synced copy was cleared as well.
+  async forget() {
+    const { ma } = await browser.storage.local.get("ma");
+    await browser.storage.local.remove("ma");
+    if (ma && ma.sync === false) return false;
+    await MA._syncSet(null);
+    return true;
   },
 
   async serverInfo(address) {

@@ -1,6 +1,9 @@
 # PLAN_YTC_02 - Reuse the Music Assistant settings on another Firefox
 
-**Status:** proposed, build authorised 2026-10-04 ("let's build plan 02"). Build spec below is final.
+**Status:** part-built (2026-10-04). 1.0.3 written to the build spec, lint clean, storage logic
+measured in a headless Firefox (seed from old local copy, sync wins, sync off removes the synced
+copy, Forget clears both). Not yet measured: real sync between two Firefox installs on one account,
+and Android.
 
 ## Goal
 
@@ -120,3 +123,12 @@ Version **1.0.3**. Supersedes the Copy/Paste parts of section 1 and fills in sec
 - `manifest.json` version 1.0.3. No new permissions (`storage` covers `storage.sync`).
 - `CHANGELOG.md` 1.0.3 with the two lines above. `README.md` "Set up Send" gains one short
   paragraph on sync and the one Save click on each new Firefox.
+
+### Build notes (2026-10-04)
+
+- Added beyond the spec, at review: `MA.loadSettings()` seeds the synced copy from a 1.0.2-era local
+  copy on first read; without it an upgraded install syncs nothing until Save is pressed again.
+- The options page help line "stored only in this Firefox profile" became "Anyone using this
+  Firefox profile can use the token." (no longer only local once sync is on).
+- 1.0.3 is signed unlisted for testing, so the AMO listing ships as the next version up; the store
+  still gets sync from its first version.

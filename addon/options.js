@@ -5,29 +5,34 @@ function say(text, kind) {
   $("status").className = kind || "";
 }
 
-// Firefox does not honour a site permission that names a port (measured: the call is blocked),
-// so the permission covers the whole host.
-function sitePattern(address) {
-  const u = new URL(address);
-  return u.protocol + "//" + u.hostname + "/*";
-}
-
 function form() {
-  return { address: $("address").value.trim().replace(/\/+$/, ""), token: $("token").value.trim() };
+  return { address: $("address").value.trim().replace(/\/+$/, ""), token: $("token").value.trim(), sync: $("sync").checked };
 }
 
-MA.loadSettings().then((s) => {
-  if (s) { $("address").value = s.address; $("token").value = s.token; }
+MA.loadSettings().then(async (s) => {
+  if (!s) return;
+  $("address").value = s.address;
+  $("token").value = s.token;
+  $("sync").checked = s.sync;
+  if (s.fromSync && !(await MA.hasPermission(s.address).catch(() => false))) {
+    say("Settings arrived from your other Firefox. Press Save to let this Firefox reach the server.");
+  }
+});
+
+$("show").addEventListener("click", () => {
+  const hidden = $("token").type === "password";
+  $("token").type = hidden ? "text" : "password";
+  $("show").textContent = hidden ? "Hide" : "Show";
 });
 
 $("save").addEventListener("click", async () => {
-  const { address, token } = form();
+  const { address, token, sync } = form();
   try {
     // permissions.request needs the click gesture, so it runs before any other await.
     let origin = null;
-    try { origin = sitePattern(address); } catch { /* saveSettings reports the bad address */ }
+    try { origin = MA.sitePattern(address); } catch { /* saveSettings reports the bad address */ }
     const granted = origin ? await browser.permissions.request({ origins: [origin] }) : true;
-    await MA.saveSettings({ address, token });
+    await MA.saveSettings({ address, token, sync });
     if (!granted) return say("Firefox needs permission to reach that address. Press Save again and allow it.", "bad");
     say("Saved. Press Test connection to check it works.", "ok");
   } catch (err) {
@@ -40,7 +45,7 @@ $("test").addEventListener("click", async () => {
   say("Testing the connection.");
   try {
     // Without the site permission Firefox blocks the call and it looks like the server is down.
-    if (!(await browser.permissions.contains({ origins: [sitePattern(address)] }))) {
+    if (!(await MA.hasPermission(address))) {
       return say("Press Save first and allow Firefox to reach that address, then test again.", "bad");
     }
     const info = await MA.serverInfo(address);
@@ -52,8 +57,10 @@ $("test").addEventListener("click", async () => {
 });
 
 $("forget").addEventListener("click", async () => {
-  await browser.storage.local.remove("ma");
+  const cleared = await MA.forget();
   $("address").value = "";
   $("token").value = "";
-  say("Forgotten. The address and token are no longer stored in this Firefox profile.", "ok");
+  say(cleared
+    ? "Forgotten. The address and token are removed from this Firefox and from your synced settings."
+    : "Forgotten. The address and token are removed from this Firefox profile.", "ok");
 });

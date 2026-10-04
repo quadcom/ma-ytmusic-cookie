@@ -14,3 +14,6 @@ button { padding: .6rem 1rem; font: inherit; color: inherit; background: transpa
 #status.ok { color: var(--ok); }
 #status.bad { color: var(--bad); }
 .help { color: var(--muted); font-size: .9rem; }
+.row { display: flex; gap: .5rem; align-items: center; }
+.check { display: flex; gap: .5rem; align-items: center; margin-top: 1rem; }
+.check input { width: auto; margin: 0; }

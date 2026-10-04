@@ -35,7 +35,7 @@ Open the add-on's settings and fill in two things:
 - **Music Assistant address**, for example `http://192.168.1.10:8095`.
 - **A long-lived token.** Make one in Music Assistant (Settings > Profile > Long-lived access tokens), not in Home Assistant, from an admin user. Signing in to Music Assistant through Home Assistant is fine. It lasts a year and is shown only once, so copy it straight away.
 
-Press **Test connection** to check both. The address and token stay only in this Firefox profile. They are not synced anywhere.
+Press **Test connection** to check both. By default the address and token sync, encrypted by Firefox, to your other Firefox devices signed in to the same Firefox account with add-on data sync on; untick the box in the settings to keep them on this device only. On each new Firefox, open the settings once and press **Save** so it can reach your server.
 
 ## Good to know
 

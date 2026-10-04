@@ -65,6 +65,11 @@
     $("send").addEventListener("click", async () => {
       busy(true);
       try {
+        // Settings that arrived by sync do not carry the site permission with them.
+        if (!(await MA.hasPermission(settings.address))) {
+          say("Open this add-on's Music Assistant settings and press Save to let this Firefox reach the server.", "err");
+          return;
+        }
         const value = await ready();
         if (!value) return;
         say("Sending...");

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- Your Music Assistant address and token can now sync to your other Firefox devices, and you can turn that off in the settings.
+- The token field has a Show button, so you can check what you pasted.
+
 ## 1.0.2
 
 - Send now works with an address that includes a port number, such as http://192.168.1.10:8095.
