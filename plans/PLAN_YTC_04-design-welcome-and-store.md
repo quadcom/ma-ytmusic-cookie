@@ -60,6 +60,11 @@ from there. Decisions are logged below as they are made.
   play in the peak: `circle cx120 cy80 r27 stroke 7`, triangle `M111 67 L135 80 L111 93 Z`) and
   **2F** (same on a red `#ff0033` disc r36, ring r24). Mockup files `logo-2e.svg`, `logo-2f.svg`.
 
+- 2026-10-04: Adrian, simplifying: option 2 with MA's lines **behind** the play symbol and a
+  thin red stroke round the play. Drawn **2G** (red `#e0312b` house, MA's white lines, white play
+  `M96 108 L166 152 L96 196 Z` with a 7-unit red stroke in front) and **2H** (same, blue house).
+  Files `logo-2g.svg`, `logo-2h.svg`. Still uses MA's lines, so the OHF question stands.
+
 ### Logo rights (researched 2026-10-04)
 
 Measured (fetched and read):
