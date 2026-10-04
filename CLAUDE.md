@@ -120,7 +120,8 @@ The plans carry the detail; read their status lines first. As of 2026-10-04:
 - 1.2.1 submitted as a **listed** AMO version, awaiting Mozilla's review (PLAN_YTC_04 build notes).
 - Still to do: two screenshots (`store/screenshots/3-settings.png`, `4-automatic.png`), the
   `2-welcome` caption and the slug `yt-music-cookie-for-music-assistant` (blocked by the AMO
-  throttle, or done by Adrian in the Developer Hub - check `dev/amo/amo.mjs show` first); after
+  throttle; Adrian, 2026-10-04: Claude finishes them by API when he checks in on 2026-10-05 -
+  run `dev/amo/amo.mjs show` first to see what is already there); after
   approval: GitHub release `v1.2.1` with the signed file and store link, README's "link coming"
   replaced, the `v*-test` pre-releases deleted (ask first).
 - Open, measured later in normal use: automatic updates' change-triggered path and the
