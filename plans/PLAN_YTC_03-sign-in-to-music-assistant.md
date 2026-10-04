@@ -126,3 +126,16 @@ All answered by Adrian 2026-10-04 ("yes to all three"):
   `https://addons.mozilla.org/api/v5/addons/categories/` (2026-10-04): categories there no longer
   carry an application, so the `android` key may be rejected - check on the listed upload.
 - 1.1.0 is signed unlisted for Adrian's test; the store listing takes the next version.
+- Measured 2026-10-04 (Adrian, signed 1.2.0): **Sign in with Home Assistant** worked end to end
+  on desktop - HA login tab, closed by itself, "Signed in". The new long-lived token appears in
+  MA's Settings > Profile > Long-lived access tokens as "YT Music Cookie add-on (win)" (not in
+  HA, and no new user - it belongs to his existing HA-linked MA user). A second, older token of
+  the same name (created 9:43, from an earlier sign-in) was left behind.
+- Patch (Adrian: "patch-it", 2026-10-04), shipped as 1.2.1: on a new sign-in the add-on revokes
+  its previous token with `auth/logout` sent under that token, but only when the old token's JWT
+  `token_name` claim starts with "YT Music Cookie add-on" (`MA.tokenName`, `MA.revokeOwnToken`
+  in `ma.js`, called from `completeSignIn` in `options.js`) - a token the user pasted in may be in
+  use elsewhere and is never touched. Measured: MA 2.10.5 tokens carry `token_name` (claim names
+  of Adrian's earlier MA token: exp, iat, is_long_lived, jti, role, sub, token_name, username);
+  the decode/guard logic unit-tested in Node (own name -> revoked, other name or non-JWT -> left).
+

@@ -127,9 +127,11 @@ $("test").addEventListener("click", testConnection);
 
 // Turns a short-lived sign-in token into this Firefox's own long-lived one, saves it and checks it.
 async function completeSignIn(address, shortToken) {
+  const previous = ((await MA.loadSettings()) || {}).token;
   const { token, isAdmin } = await MA.finishSignIn(address, shortToken);
   $("token").value = token;
   await MA.saveSettings({ address, token, sync: $("sync").checked });
+  if (previous && previous !== token) await MA.revokeOwnToken(address, previous);
   showBadge();
   if (!isAdmin) {
     return say("Signed in, but this account is not a Music Assistant admin, so it cannot change YouTube Music's sign-in. Sign in with an admin account.", "bad");

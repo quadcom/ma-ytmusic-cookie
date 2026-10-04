@@ -164,6 +164,24 @@ const MA = {
     return r.access_token;
   },
 
+  // Name stored inside a Music Assistant token (its JWT "token_name" claim), or "" if unreadable.
+  tokenName(token) {
+    try {
+      const part = String(token).split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      return String(JSON.parse(atob(part + "=".repeat((4 - (part.length % 4)) % 4))).token_name || "");
+    } catch {
+      return "";
+    }
+  },
+
+  // Revokes a token this add-on made earlier, so signing in again leaves no stale token behind.
+  // Only tokens named by the add-on are touched; one the user pasted in may be in use elsewhere.
+  async revokeOwnToken(address, token) {
+    if (!MA.tokenName(token).startsWith("YT Music Cookie add-on")) return false;
+    await MA.call({ address, token }, "auth/logout").catch(() => {});
+    return true;
+  },
+
   // Swaps the short-lived sign-in token for a long-lived one named after this platform, so the
   // user can tell devices apart in Music Assistant's token list, then ends the short session.
   async finishSignIn(address, shortToken) {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Signing in again removes the add-on's previous Music Assistant token instead of leaving it behind.
+
 ## 1.2.0
 
 - A new look, with its own logo.
