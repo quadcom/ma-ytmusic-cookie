@@ -230,3 +230,11 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
 - Measured 2026-10-04 on Adrian's desktop, signed 1.2.0 (unlisted): **Find my server** filled
   the LAN address and offered the HTTPS base URL as the away-from-home choice ("a great
   unexpected benefit" - Adrian). Phone check of the new look still to do.
+- Store screenshots made 2026-10-04 (1280x800, example data only: address `http://192.168.1.10:8095`,
+  fake "last sent" times): `store/screenshots/1-popup.png` (popup in an iframe beside a headline),
+  `2-welcome.png`, `3-settings.png`, `4-automatic.png`. How: Firefox's WebDriver BiDi refuses
+  `setViewport`/`captureScreenshot` on extension pages ("does not support browsing contexts in
+  privileged scope"), so the shipping pages were served from the build box with a screenshot-only
+  `shim.js` standing in for the WebExtension API (storage, permissions, cookies, MA fetches) and
+  captured with `bb-shot.mjs` in the box's Chrome. The shim lives only in the scratchpad.
+
