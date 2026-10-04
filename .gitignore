@@ -1,0 +1,5 @@
+# Private values and credentials belonging to one machine or one project.
+local/
+
+# Rendered output, never a source.
+.preview/
