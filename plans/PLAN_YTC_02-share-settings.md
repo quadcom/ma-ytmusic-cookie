@@ -1,6 +1,6 @@
 # PLAN_YTC_02 - Reuse the Music Assistant settings on another Firefox
 
-**Status:** proposed (2026-10-04). Nothing built.
+**Status:** proposed, build authorised 2026-10-04 ("let's build plan 02"). Build spec below is final.
 
 ## Goal
 
@@ -17,7 +17,7 @@ account. Sharing with another person stays a manual copy.
 ## Decision (Adrian, 2026-10-04)
 
 "An automatic sync is preferable to a manual copy." Sync (part 2) is the main route.
-Proposed consequence, awaiting his yes: sync **on by default**; part 1 shrinks to just the **Show**
+Confirmed by Adrian 2026-10-04 ("yes to both"): sync **on by default**; part 1 shrinks to just the **Show**
 toggle on the token field (so the token can still be copied by hand if sync does not reach the
 phone); the `ytc1:` Copy/Paste settings line and the `clipboardRead` permission are dropped.
 
@@ -71,10 +71,52 @@ Facts (reasoned from Mozilla docs, not yet tested here):
 ## Version and changelog
 
 Ships as the next version (1.0.3 if built before the AMO listing, so the store gets it from day
-one). Changelog lines: "Copy your Music Assistant settings to another Firefox in one line." and
-"Optionally sync the settings to your other Firefox devices."
+one). Changelog lines (corrected 2026-10-04 after the decision): "Your Music Assistant settings now
+follow your Firefox account to your other Firefox devices." and "A Show button lets you see the
+saved token."
 
 ## Open questions (waiting on Adrian)
 
 1. ~~Both parts, or only one?~~ Answered 2026-10-04: sync preferred over manual copy.
-2. Confirm: sync on by default, keep only the Show toggle, drop Copy/Paste settings line?
+2. ~~Confirm sync on by default, Show toggle only?~~ Yes to both, 2026-10-04.
+
+## Build spec (final, 2026-10-04)
+
+Version **1.0.3**. Supersedes the Copy/Paste parts of section 1 and fills in section 2.
+
+### `addon/ma.js`
+- `MA.sitePattern(address)` -> `<scheme>://<host>/*` (moved from `options.js`, same comment about
+  Firefox ignoring a port in a site permission).
+- `MA.hasPermission(address)` -> `browser.permissions.contains({origins: [MA.sitePattern(address)]})`.
+- Storage: `storage.local` key `"ma"` = `{address, token, sync}`; `storage.sync` key `"ma"` =
+  `{address, token}`.
+- `MA.loadSettings()` -> `{address, token, sync, fromSync}` or null:
+  local `ma.sync === false` -> local copy only. Otherwise the sync copy wins when complete (so a
+  new token saved on one device reaches the others), `fromSync: true`; else the local copy.
+  `sync` defaults to true when nothing says otherwise.
+- `MA.saveSettings({address, token, sync})`: same validation as now; writes local; `sync` true ->
+  writes the sync copy, false -> `storage.sync.remove("ma")`.
+- `MA.forget()`: removes local `"ma"`; removes the sync copy too when sync was on.
+- `MA.pushCookie` / `MA.findYtProviders` unchanged.
+
+### `addon/options.html` / `options.js`
+- Token field gets a **Show** button toggling `type` password/text (label switches Show/Hide).
+- Checkbox `#sync`, checked by default, label "Sync these settings to my other Firefox devices".
+- Help line under it: "Firefox encrypts these before they leave this device. They reach only
+  Firefox installs signed in to the same Firefox account with add-on data sync turned on."
+- On load: fill fields and checkbox from `loadSettings()`. If `fromSync` and
+  `!hasPermission(address)`: status "Settings arrived from your other Firefox. Press Save to let
+  this Firefox reach the server."
+- Save: unchanged order (permission request first, inside the click), passes `sync`.
+- Test: uses `MA.hasPermission`.
+- Forget: `MA.forget()`; message says whether it also cleared the synced copy.
+
+### `addon/popup.js`
+- Send button shows when `loadSettings()` returns settings (either copy). On click, before any
+  MA call: if `!(await MA.hasPermission(address))` -> "Open this add-on's Music Assistant settings
+  and press Save to let this Firefox reach the server." and stop.
+
+### Other
+- `manifest.json` version 1.0.3. No new permissions (`storage` covers `storage.sync`).
+- `CHANGELOG.md` 1.0.3 with the two lines above. `README.md` "Set up Send" gains one short
+  paragraph on sync and the one Save click on each new Firefox.
