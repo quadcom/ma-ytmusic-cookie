@@ -250,5 +250,16 @@ fits an add-on that sends a login cookie only to a server the user names (likely
   extension pages includes `upgrade-insecure-requests`, so the fetch went to `https://<ip>:8095`,
   where MA has no TLS (curl exit 35). Fix in 1.0.1: `content_security_policy.extension_pages` set
   to `script-src 'self'; object-src 'self';` (the default minus the upgrade).
-- MA's `/api` needs an **MA** token; a Home Assistant token is a different thing. (Reasoned; not
-  probed - Adrian first tried the token he uses for VS Code.)
+- Correction (2026-10-04, measured): the 1.0.1 change was not enough on its own. In a clean
+  headless Firefox profile driven over WebDriver BiDi, with the add-on temporarily installed, a
+  POST to `http://<ip>:8095/api` threw `NetworkError` although the response (400) arrived, while
+  `GET /info` (which MA serves with `Access-Control-Allow-Origin: *`) worked. Granted host pattern
+  `http://<ip>:8095/*` -> blocked; `http://<ip>/*` -> works (each in a fresh profile). Firefox does
+  not apply a host permission that names a port to the cross-site check. Fix in 1.0.2:
+  `addon/options.js` `sitePattern()` requests `<scheme>://<host>/*` (no port). The HTTPS proxy
+  name never had a port, which is why it worked.
+- MA's `/api` needs an **MA** token (measured): Adrian's first token had JWT claims only
+  `iss/iat/exp` - a Home Assistant long-lived token - and MA answered 401. MA's own tokens carry
+  `sub/jti/username/role/token_name/is_long_lived` (`music_assistant/helpers/jwt_auth.py:60`).
+  Made in MA's UI at Settings > Profile > Long-lived access tokens; an HA-linked MA user can make
+  one. Settings page and 401 message now say so (1.0.2).

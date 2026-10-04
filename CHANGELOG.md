@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- Send now works with an address that includes a port number, such as http://192.168.1.10:8095.
+- The settings page now says where to make the token: in Music Assistant, not Home Assistant.
+
 ## 1.0.1
 
 - Send now reaches a Music Assistant server on a plain http:// address, such as one on your home network.

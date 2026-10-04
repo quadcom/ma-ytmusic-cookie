@@ -40,7 +40,7 @@ const MA = {
       throw new Error(MA._unreachable(settings.address));
     }
     if (res.status === 401 || res.status === 403) {
-      throw new Error("Music Assistant refused the token. Make a new long-lived token in your Music Assistant profile and save it in this add-on's settings.");
+      throw new Error("Music Assistant refused the token. Make a long-lived token in Music Assistant (Settings > Profile), not in Home Assistant, and save it in this add-on's settings.");
     }
     if (!res.ok) throw new Error(`Music Assistant returned an error (${res.status}): ${(await res.text()).trim()}.`);
     return res.json();

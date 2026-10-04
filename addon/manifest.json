@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YT Music Cookie for Music Assistant",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Copies or sends your YouTube Music login cookie to Music Assistant in one tap.",
   "permissions": ["cookies", "clipboardWrite", "activeTab", "storage", "tabs"],
   "host_permissions": ["https://music.youtube.com/*", "https://*.youtube.com/*"],

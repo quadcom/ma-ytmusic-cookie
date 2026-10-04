@@ -5,6 +5,13 @@ function say(text, kind) {
   $("status").className = kind || "";
 }
 
+// Firefox does not honour a site permission that names a port (measured: the call is blocked),
+// so the permission covers the whole host.
+function sitePattern(address) {
+  const u = new URL(address);
+  return u.protocol + "//" + u.hostname + "/*";
+}
+
 function form() {
   return { address: $("address").value.trim().replace(/\/+$/, ""), token: $("token").value.trim() };
 }
@@ -18,7 +25,7 @@ $("save").addEventListener("click", async () => {
   try {
     // permissions.request needs the click gesture, so it runs before any other await.
     let origin = null;
-    try { origin = new URL(address).origin + "/*"; } catch { /* saveSettings reports the bad address */ }
+    try { origin = sitePattern(address); } catch { /* saveSettings reports the bad address */ }
     const granted = origin ? await browser.permissions.request({ origins: [origin] }) : true;
     await MA.saveSettings({ address, token });
     if (!granted) return say("Firefox needs permission to reach that address. Press Save again and allow it.", "bad");
@@ -33,7 +40,7 @@ $("test").addEventListener("click", async () => {
   say("Testing the connection.");
   try {
     // Without the site permission Firefox blocks the call and it looks like the server is down.
-    if (!(await browser.permissions.contains({ origins: [new URL(address).origin + "/*"] }))) {
+    if (!(await browser.permissions.contains({ origins: [sitePattern(address)] }))) {
       return say("Press Save first and allow Firefox to reach that address, then test again.", "bad");
     }
     const info = await MA.serverInfo(address);

@@ -33,7 +33,7 @@ Then allow it in private windows: open the add-on's settings in Firefox and turn
 Open the add-on's settings and fill in two things:
 
 - **Music Assistant address**, for example `http://192.168.1.10:8095`.
-- **A long-lived token.** Make one in Music Assistant from an admin profile. It lasts a year and is shown only once, so copy it straight away.
+- **A long-lived token.** Make one in Music Assistant (Settings > Profile > Long-lived access tokens), not in Home Assistant, from an admin user. Signing in to Music Assistant through Home Assistant is fine. It lasts a year and is shown only once, so copy it straight away.
 
 Press **Test connection** to check both. The address and token stay only in this Firefox profile. They are not synced anywhere.
 
