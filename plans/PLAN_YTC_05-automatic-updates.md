@@ -104,8 +104,22 @@ Reasoned, to be measured:
 
 ## Open questions (waiting on Adrian)
 
-1. Run the playback probe (Step 0.1) with Adrian before the throttle default is fixed?
-2. Default minimum gap between pushes: 6 hours suggested; shorter if the probe shows a reload
-   does not interrupt playback.
-3. Container picker now, or default store only for 1.2.0 (recommended: default store only)?
-4. Android: offer the toggle there too (untested background behaviour), or desktop only for now?
+Answered by Adrian 2026-10-04:
+1. Playback probe: yes, run it together (in progress).
+2. Minimum gap: set it from the probe's result; 6 hours if the probe cannot decide.
+3. Containers: Adrian was unsure what they are (Firefox's Multi-Account Containers - separate
+   logins per tab group); default store only for 1.2.0, no picker, no `contextualIdentities`.
+4. Android: no automatic updates on the phone - the settings card is hidden when
+   `runtime.getPlatformInfo().os === "android"`. Reason (Adrian): on a phone people use the
+   YouTube Music app, not the browser, so there are no browser cookie changes to follow. The
+   phone keeps the manual Send, which Adrian uses when MA shows a cookie error while he is away
+   from his desk.
+5. Open: an easier way to fix a dead cookie from the phone (see "Phone fix" below).
+
+## Phone fix (proposed 2026-10-04, awaiting Adrian)
+
+With automatic updates on in the desktop Firefox, the health check already pushes a fresh cookie
+as soon as MA reports the YouTube Music provider in error. Shortening that check from 30 to
+5 minutes (one small read-only API call) makes MA heal itself within minutes, from wherever
+Adrian is, as long as the desktop Firefox is running - so the phone usually needs to do nothing.
+The phone's manual Send stays as the fallback for when the desktop is off.
