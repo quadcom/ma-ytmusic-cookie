@@ -72,10 +72,13 @@ const MA = {
 
   async call(settings, command, args) {
     let res;
+    // The sign-in commands run before any token exists, so the header is left off when there is none.
+    const headers = { "Content-Type": "application/json" };
+    if (settings.token) headers.Authorization = "Bearer " + settings.token;
     try {
       res = await fetch(settings.address + "/api", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: "Bearer " + settings.token },
+        headers,
         body: JSON.stringify({ message_id: crypto.randomUUID(), command, args: args || {} }),
       });
     } catch {
@@ -86,6 +89,67 @@ const MA = {
     }
     if (!res.ok) throw new Error(`Music Assistant returned an error (${res.status}): ${(await res.text()).trim()}.`);
     return res.json();
+  },
+
+  async loginProviders(address) {
+    const list = await MA.call({ address }, "auth/providers");
+    return (list || []).map((p) => p.provider_id);
+  },
+
+  // Opens Home Assistant's sign-in page in a tab and resolves with the short-lived token Music
+  // Assistant appends to the return address. The nonce ties the answer to this attempt.
+  async signInWithHomeAssistant(address) {
+    const nonce = crypto.randomUUID();
+    const returnUrl = address + "/?ytc_signin=" + nonce;
+    const r = await MA.call({ address }, "auth/authorization_url", { provider_id: "homeassistant", return_url: returnUrl });
+    const url = r && r.authorization_url;
+    if (!url) throw new Error((r && r.error) || "This Music Assistant offers no sign-in this add-on knows. Paste a token instead.");
+    const tab = await browser.tabs.create({ url });
+    return new Promise((resolve, reject) => {
+      let timer;
+      const done = (fn, value, closeTab) => {
+        clearTimeout(timer);
+        browser.tabs.onUpdated.removeListener(onUpdated);
+        browser.tabs.onRemoved.removeListener(onRemoved);
+        if (closeTab) browser.tabs.remove(tab.id).catch(() => {});
+        fn(value);
+      };
+      const onUpdated = (id, changeInfo, t) => {
+        if (id !== tab.id) return;
+        const u = changeInfo.url || (t && t.url);
+        if (!u || !u.startsWith(returnUrl)) return;
+        let code = null;
+        try { code = new URL(u).searchParams.get("code"); } catch { /* treated as no code */ }
+        if (code) done(resolve, code, true);
+      };
+      const onRemoved = (id) => {
+        if (id === tab.id) done(reject, new Error("Sign-in was closed before it finished. Press Sign in to try again."), false);
+      };
+      timer = setTimeout(() => done(reject, new Error("Sign-in timed out. Press Sign in to try again."), true), 5 * 60 * 1000);
+      browser.tabs.onUpdated.addListener(onUpdated);
+      browser.tabs.onRemoved.addListener(onRemoved);
+    });
+  },
+
+  async signInWithAccount(address, username, password) {
+    const r = await MA.call({ address }, "auth/login", { username, password, provider_id: "builtin", device_name: "YT Music Cookie add-on" });
+    if (!r || !r.success || !r.access_token) {
+      const why = r && r.error ? String(r.error).replace(/\.*$/, "") : "Music Assistant did not accept that sign-in";
+      throw new Error(why + ". Check the username and password and press Sign in again.");
+    }
+    return r.access_token;
+  },
+
+  // Swaps the short-lived sign-in token for a long-lived one named after this platform, so the
+  // user can tell devices apart in Music Assistant's token list, then ends the short session.
+  async finishSignIn(address, shortToken) {
+    const os = (await browser.runtime.getPlatformInfo()).os;
+    const short = { address, token: shortToken };
+    const token = await MA.call(short, "auth/token/create", { name: "YT Music Cookie add-on (" + os + ")" });
+    if (typeof token !== "string" || !token) throw new Error("Sign-in did not finish. Press Sign in to try again.");
+    const me = await MA.call({ address, token }, "auth/me");
+    await MA.call(short, "auth/logout").catch(() => {});
+    return { token, isAdmin: !!me && me.role === "admin" };
   },
 
   async findYtProviders(settings) {

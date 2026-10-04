@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Sign in to Music Assistant from the add-on - no token to make or paste.
+- Works the same on your phone: sign in there once.
+
 ## 1.0.3
 
 - Your Music Assistant address and token can now sync to your other Firefox devices, and you can turn that off in the settings.

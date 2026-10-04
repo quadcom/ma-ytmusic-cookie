@@ -1,6 +1,8 @@
 # PLAN_YTC_03 - "Sign in to Music Assistant" makes the token itself, then release to the store
 
-**Status:** proposed, build authorised 2026-10-04 ("yes to all three, build it out").
+**Status:** part-built (2026-10-04). 1.1.0 code written, lint clean, sign-in tab mechanism
+measured in a headless Firefox against Adrian's MA (see build notes). Waiting on: Adrian's real
+sign-in on desktop and phone, then the store release.
 
 ## Goal
 
@@ -109,3 +111,18 @@ All answered by Adrian 2026-10-04 ("yes to all three"):
 1. Both sign-ins: Home Assistant and Music Assistant username/password.
 2. "Paste a token instead" stays as a hidden fallback.
 3. Store name stays "YT Music Cookie for Music Assistant".
+
+## Build notes (2026-10-04)
+
+- Measured in a headless Firefox (WebDriver BiDi, add-on temporarily installed, address the HTTPS
+  proxy name): `MA.loginProviders` -> `["builtin","homeassistant"]`; `signInWithHomeAssistant`
+  opened a tab on HA's `/auth/authorize` page; navigating that tab to the `return_url` with
+  `code=FAKE123` resolved the sign-in with that code and closed the tab; closing the tab early
+  rejected with the "closed before it finished" sentence. The real HA login, `auth/token/create`,
+  `auth/me` and `auth/logout` are not yet run (need Adrian's sign-in).
+- Choices made by the writer, kept at review: `signInWithAccount` turns MA's `error` into a full
+  sentence with a next step; a non-string `auth/token/create` answer fails as "did not finish".
+- `amo-metadata.json` category `photos-music-videos` checked against
+  `https://addons.mozilla.org/api/v5/addons/categories/` (2026-10-04): categories there no longer
+  carry an application, so the `android` key may be rejected - check on the listed upload.
+- 1.1.0 is signed unlisted for Adrian's test; the store listing takes the next version.

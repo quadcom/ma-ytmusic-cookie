@@ -40,7 +40,7 @@ $("save").addEventListener("click", async () => {
   }
 });
 
-$("test").addEventListener("click", async () => {
+async function testConnection() {
   const { address, token } = form();
   say("Testing the connection.");
   try {
@@ -54,7 +54,71 @@ $("test").addEventListener("click", async () => {
   } catch (err) {
     say(err.message, "bad");
   }
-});
+}
+
+$("test").addEventListener("click", testConnection);
+
+// Turns a short-lived sign-in token into this Firefox's own long-lived one, saves it and checks it.
+async function completeSignIn(address, shortToken) {
+  const { token, isAdmin } = await MA.finishSignIn(address, shortToken);
+  $("token").value = token;
+  await MA.saveSettings({ address, token, sync: $("sync").checked });
+  if (!isAdmin) {
+    return say("Signed in, but this account is not a Music Assistant admin, so it cannot change YouTube Music's sign-in. Sign in with an admin account.", "bad");
+  }
+  say("Signed in. This Firefox now has its own Music Assistant token.", "ok");
+  await testConnection();
+}
+
+// Runs one sign-in attempt; the password never outlives it.
+async function attempt(fn) {
+  try {
+    await fn();
+  } catch (err) {
+    say(err.message, "bad");
+  } finally {
+    $("password").value = "";
+  }
+}
+
+$("signin").addEventListener("click", () => attempt(async () => {
+  const { address } = form();
+  $("choice").hidden = true;
+  $("account").hidden = true;
+  if (!address || !(await MA.hasPermission(address).catch(() => false))) {
+    return say("Enter the address and press Save first, then sign in.", "bad");
+  }
+  say("Asking Music Assistant how it signs people in.");
+  const providers = await MA.loginProviders(address);
+  const ha = providers.includes("homeassistant"), builtin = providers.includes("builtin");
+  if (ha && builtin) {
+    $("choice").hidden = false;
+    return say("Choose how to sign in.");
+  }
+  if (ha) return signInHa();
+  if (builtin) return showAccount();
+  say("This Music Assistant offers no sign-in this add-on knows. Paste a token instead.", "bad");
+}));
+
+function showAccount() {
+  $("account").hidden = false;
+  say("Enter your Music Assistant username and password, then press Sign in.");
+}
+
+async function signInHa() {
+  const { address } = form();
+  say("Sign in on the Home Assistant page that just opened.");
+  await completeSignIn(address, await MA.signInWithHomeAssistant(address));
+}
+
+$("signin-ha").addEventListener("click", () => attempt(signInHa));
+$("signin-builtin").addEventListener("click", showAccount);
+
+$("signin-account").addEventListener("click", () => attempt(async () => {
+  const { address } = form();
+  say("Signing in.");
+  await completeSignIn(address, await MA.signInWithAccount(address, $("username").value.trim(), $("password").value));
+}));
 
 $("forget").addEventListener("click", async () => {
   const cleared = await MA.forget();

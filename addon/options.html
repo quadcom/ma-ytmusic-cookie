@@ -11,8 +11,24 @@
   <h1>Music Assistant settings</h1>
   <label for="address">Music Assistant address</label>
   <input id="address" type="url" placeholder="http://192.168.1.10:8095" autocomplete="off">
-  <label for="token">Access token</label>
-  <span class="row"><input id="token" type="password" autocomplete="off"> <button id="show" type="button">Show</button></span>
+  <div class="buttons"><button id="signin" type="button">Sign in to Music Assistant</button></div>
+  <div id="choice" class="buttons" hidden>
+    <button id="signin-ha" type="button">Sign in with Home Assistant</button>
+    <button id="signin-builtin" type="button">Sign in with a Music Assistant account</button>
+  </div>
+  <div id="account" hidden>
+    <label for="username">Username</label>
+    <input id="username" type="text" autocomplete="off">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="off">
+    <div class="buttons"><button id="signin-account" type="button">Sign in</button></div>
+  </div>
+  <details>
+    <summary>Paste a token instead</summary>
+    <label for="token">Access token</label>
+    <span class="row"><input id="token" type="password" autocomplete="off"> <button id="show" type="button">Show</button></span>
+    <p class="help">Make the token in Music Assistant, not Home Assistant: Settings > Profile > Long-lived access tokens. Signing in to Music Assistant through Home Assistant is fine. The account must be an admin, because changing YouTube Music's sign-in needs admin. The token lasts one year.</p>
+  </details>
   <label class="check"><input id="sync" type="checkbox" checked> Sync these settings to my other Firefox devices</label>
   <p class="help">Firefox encrypts these before they leave this device. They reach only Firefox installs signed in to the same Firefox account with add-on data sync turned on.</p>
   <div class="buttons">
@@ -21,7 +37,6 @@
     <button id="forget">Forget</button>
   </div>
   <p id="status" role="status"></p>
-  <p class="help">Make the token in Music Assistant, not Home Assistant: Settings > Profile > Long-lived access tokens. Signing in to Music Assistant through Home Assistant is fine. The account must be an admin, because changing YouTube Music's sign-in needs admin. The token lasts one year.</p>
   <p class="help">Anyone using this Firefox profile can use the token.</p>
   <p class="help">Away from home, use an address your phone can reach from outside.</p>
 </main>

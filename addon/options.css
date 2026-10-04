@@ -17,3 +17,6 @@ button { padding: .6rem 1rem; font: inherit; color: inherit; background: transpa
 .row { display: flex; gap: .5rem; align-items: center; }
 .check { display: flex; gap: .5rem; align-items: center; margin-top: 1rem; }
 .check input { width: auto; margin: 0; }
+[hidden] { display: none !important; }
+details { margin-top: 1rem; }
+summary { cursor: pointer; font-weight: 600; }

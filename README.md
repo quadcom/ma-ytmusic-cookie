@@ -30,12 +30,18 @@ Then allow it in private windows: open the add-on's settings in Firefox and turn
 
 ## Set up Send (once)
 
-Open the add-on's settings and fill in two things:
+Open the add-on's settings and do this:
 
-- **Music Assistant address**, for example `http://192.168.1.10:8095`.
-- **A long-lived token.** Make one in Music Assistant (Settings > Profile > Long-lived access tokens), not in Home Assistant, from an admin user. Signing in to Music Assistant through Home Assistant is fine. It lasts a year and is shown only once, so copy it straight away.
+1. Type your **Music Assistant address**, for example `http://192.168.1.10:8095`.
+2. Press **Save and allow**, so Firefox lets the add-on reach your server.
+3. Press **Sign in to Music Assistant**.
+4. Choose how to sign in: with **Home Assistant** (a Home Assistant login page opens in a tab and closes by itself), or with your **Music Assistant username and password**.
 
-Press **Test connection** to check both. By default the address and token sync, encrypted by Firefox, to your other Firefox devices signed in to the same Firefox account with add-on data sync on; untick the box in the settings to keep them on this device only. On each new Firefox, open the settings once and press **Save** so it can reach your server.
+The add-on then makes its own long-lived Music Assistant token for this device. There is nothing to copy or paste. The account must be a Music Assistant admin.
+
+If you would rather use a token you made yourself, choose "Paste a token instead". Make it in Music Assistant (Settings > Profile > Long-lived access tokens), not in Home Assistant.
+
+Press **Test connection** to check it. By default the address and sign-in sync, encrypted by Firefox, between your desktop Firefox installs signed in to the same Firefox account with add-on data sync on; untick the box in the settings to keep them on this device only. Firefox for Android has no add-on sync, so sign in once on your phone too.
 
 ## Good to know
 
