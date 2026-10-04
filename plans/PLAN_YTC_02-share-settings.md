@@ -140,3 +140,10 @@ Version **1.0.3**. Supersedes the Copy/Paste parts of section 1 and fills in sec
   (desktop `storage-sync-v2.sqlite` held nothing for the add-on before that).
 - Idea raised for a later plan, not built: a "Sign in to Music Assistant" button on the settings
   page that makes the token itself, so no device ever needs a token pasted in.
+- Proposed 2026-10-04 (Adrian, testing 1.2.0 on his Pixel): hide the Sync card on Android, as the
+  automatic-updates card already is - Firefox for Android has no add-on sync, so the switch does
+  nothing there and its own hint says so. Change: in `options.js`, when
+  `runtime.getPlatformInfo().os === "android"`, hide the Sync card (sync stays on internally; on
+  Android `storage.sync` behaves as local storage, so nothing else changes). Waiting on
+  "patch-it"; would ship in 1.2.1.
+
