@@ -237,4 +237,20 @@ written yes. YouTube Music's ring inside our icon conflicts with Google's no-mod
   privileged scope"), so the shipping pages were served from the build box with a screenshot-only
   `shim.js` standing in for the WebExtension API (storage, permissions, cookies, MA fetches) and
   captured with `bb-shot.mjs` in the box's Chrome. The shim lives only in the scratchpad.
+- **Submitted 2026-10-04** (Adrian: "submit it all"): `web-ext sign --channel listed
+  --amo-metadata amo-metadata.json` uploaded 1.2.1 as the first listed version (AMO version id
+  6540944); it passed automatic validation and the add-on status is `nominated` (awaiting
+  Mozilla's review). The metadata landed: name, summary, description, category
+  `photos-music-videos`, homepage, support URL, licence MIT. Listing URL until the slug changes:
+  https://addons.mozilla.org/en-US/firefox/addon/b246d3f55b284de591d0/
+- Screenshots via API v5 previews (JWT from the AMO key; script `amo.mjs`/`amo-previews.mjs` in
+  the session scratchpad): `1-popup` uploaded with its caption; `2-welcome` uploaded, caption not
+  set; `3-settings`, `4-automatic`, the `2-welcome` caption and the slug change to
+  `yt-music-cookie-for-music-assistant` were **refused by AMO's write throttle** (429, "available
+  in 73942 seconds" - a daily limit, about 20 hours). Measured: AMO allows only a few API writes
+  in a burst, then locks writes for the day; captions cannot go in the multipart upload
+  ("You must provide an object of {lang-code:value}") and need a JSON PATCH afterwards.
+- Left to do: the two remaining screenshots, the welcome caption and the slug - in the Developer
+  Hub by hand, or by API after the throttle lifts; then, once Mozilla approves, the GitHub
+  release v1.2.1 with the store link and the README's "link coming" replaced.
 
